@@ -123,7 +123,6 @@ export default {
     monitoringLoading: "Inicializando monitoramento...",
     stopMonitoring: "Parar Monitoramento",
     changeDevice: "Trocar Dispositivo",
-    redirecting: "Redirecionando...",
 
     // Sinal perdido
     signalLost: {
@@ -867,7 +866,8 @@ export default {
   wifi: {
     idle: {
       tapToStart: "Toque para analisar Wi-Fi",
-      description: "Monitore sua conexão Wi-Fi em tempo real com intensidade de sinal, frequência e detalhes da rede.",
+      description:
+        "Monitore sua conexão Wi-Fi em tempo real com intensidade de sinal, frequência e detalhes da rede.",
       hint: "O app mostrará as informações da sua conexão atual. Usuários premium também podem escanear redes próximas e analisar canais.",
     },
     scanning: "Analisando rede...",
@@ -897,7 +897,8 @@ export default {
       title: "Redes próximas",
       empty: "Nenhuma rede encontrada",
       scanning: "Escaneando redes próximas...",
-      iosNote: "O escaneamento de redes próximas requer permissão de localização para detectar redes Wi-Fi.",
+      iosNote:
+        "O escaneamento de redes próximas requer permissão de localização para detectar redes Wi-Fi.",
     },
     channels: {
       title: "Análise de canais",
@@ -907,7 +908,8 @@ export default {
     },
     unavailable: {
       title: "Sem Conexão",
-      message: "Você não está conectado a nenhuma rede. Conecte-se ao Wi-Fi e tente novamente.",
+      message:
+        "Você não está conectado a nenhuma rede. Conecte-se ao Wi-Fi e tente novamente.",
     },
     error: {
       title: "Erro",
@@ -922,6 +924,110 @@ export default {
       graphWaiting: "Coletando dados do sinal...",
       min: "Mín",
       max: "Máx",
+    },
+  },
+
+  // Camera Detector
+  cameraDetector: {
+    title: "Detector de Câmeras",
+    subtitle: "Encontre câmeras Wi-Fi escondidas",
+    entryTitle: "Detector de Câmeras",
+    entrySubtitle: "Procure câmeras Wi-Fi escondidas ao seu redor",
+    scanButton: "Iniciar varredura",
+    rescanButton: "Escanear novamente",
+    scanning: "Procurando dispositivos ao redor...",
+    hiddenSsid: "Rede oculta",
+    footer:
+      "Esta ferramenta reduz o risco, não dá garantia. Nenhum app detecta toda câmera — combine com uma busca física (reflexo de lente, furos suspeitos, objetos fora do lugar).",
+    intro: {
+      title: "Procure câmeras escondidas",
+      body: "Câmeras espiãs em quartos de hotel e Airbnbs quase sempre usam Wi-Fi. Esta varredura ajuda a localizá-las usando os sensores do seu telefone.",
+      disclaimer:
+        "Resultado honesto: sinalizamos dispositivos suspeitos, nunca afirmamos 'você está seguro'. Um roteador comum também pode aparecer — use o bom senso.",
+      tips: {
+        wifi: {
+          title: "Câmeras com Wi-Fi próprio",
+          body: "Detectamos e localizamos por proximidade as câmeras que emitem a própria rede.",
+        },
+        network: {
+          title: "Câmeras na rede do local",
+          body: "Procuramos câmeras já conectadas ao Wi-Fi (portas RTSP/ONVIF). Detecta presença, não a localização.",
+        },
+        physical: {
+          title: "Busca física",
+          body: "Confira reflexos de lente, tomadas, detectores de fumaça e objetos apontados para a cama.",
+        },
+      },
+    },
+    suspicion: {
+      high: "Alta suspeita",
+      medium: "Suspeita média",
+      low: "Baixa suspeita",
+      none: "Comum",
+    },
+    reasons: {
+      knownVendor: "Fabricante de câmera",
+      ssidPattern: "Nome suspeito",
+      hiddenSsid: "Rede oculta",
+      openNetwork: "Rede aberta",
+      strongSignalClose: "Sinal muito forte (perto)",
+    },
+    results: {
+      suspectsTitle: "APs próximos suspeitos",
+      suspectsSubtitle:
+        "Ordenados por suspeita e sinal. Toque para caçar por proximidade.",
+      noSuspects:
+        "Nenhuma rede próxima encontrada. Ative o Wi-Fi e a localização e tente de novo.",
+      networkTitle: "Câmeras na rede",
+      networkSubtitle:
+        "Procura câmeras conectadas ao Wi-Fi atual (precisa estar conectado à mesma rede).",
+      networkScanButton: "Escanear a rede",
+      networkRescan: "Escanear de novo",
+      networkScanning: "Varrendo a rede...",
+      networkNone: "Nenhum dispositivo parecido com câmera encontrado na rede.",
+      networkUnavailable:
+        "Indisponível agora. Conecte-se a um Wi-Fi — e este recurso é ativado após atualizar o app.",
+      networkError: "Não foi possível varrer a rede. Tente novamente.",
+    },
+    hostKind: {
+      camera: "Possível câmera",
+      nvr: "Possível gravador (NVR/DVR)",
+      generic: "Dispositivo com porta de câmera",
+    },
+    host: {
+      ports: "Portas",
+    },
+    hunt: {
+      estimatedDistance: "Distância estimada",
+      approximation: "Estimativa aproximada por RSSI",
+      rssiTitle: "Sinal ao vivo",
+      back: "Voltar à lista",
+      throttleNote:
+        "O Android limita a frequência das leituras de Wi-Fi, então a distância atualiza a cada poucos segundos. Ande devagar para sentir o sinal esquentar ou esfriar.",
+      guidance: {
+        near: "🔥 Muito perto — procure aqui!",
+        medium: "Esquentando — continue andando.",
+        far: "Frio — afaste-se nessa direção.",
+        unknown: "Procurando o sinal...",
+      },
+    },
+    errors: {
+      locationOff: {
+        title: "Ative a localização",
+        message:
+          "O Android exige localização ligada para escanear redes Wi-Fi próximas.",
+      },
+      notAndroid: {
+        title: "Apenas no Android",
+        message:
+          "A varredura de Wi-Fi só está disponível no Android. O iOS não permite esse acesso.",
+      },
+      scanFailed: {
+        title: "Falha na varredura",
+        message: "Não foi possível escanear as redes. Tente novamente.",
+      },
+      openSettings: "Abrir configurações",
+      retry: "Tentar novamente",
     },
   },
 

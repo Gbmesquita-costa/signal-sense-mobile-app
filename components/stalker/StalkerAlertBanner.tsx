@@ -32,7 +32,8 @@ const StalkerAlertBanner = memo(function StalkerAlertBanner({
     >
       <Pressable
         onPress={onPress}
-        className="flex-row items-center px-4 py-3 rounded-xl active:opacity-80"
+        className="flex-row items-center px-4 
+        py-3 rounded-xl active:opacity-80"
         style={{
           backgroundColor: isDark
             ? "rgba(239, 68, 68, 0.15)"
@@ -51,10 +52,7 @@ const StalkerAlertBanner = memo(function StalkerAlertBanner({
         </View>
 
         <View className="flex-1 ml-3">
-          <Text
-            className="text-sm font-bold"
-            style={{ color: theme.error }}
-          >
+          <Text className="text-sm font-bold" style={{ color: theme.error }}>
             {t("antiStalking.alert.title")}
           </Text>
           <Text

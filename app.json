@@ -3,40 +3,51 @@
     "name": "SignalSense",
     "slug": "signal-sense",
     "version": "1.0.0",
+    "owner": "signalsense",
     "orientation": "portrait",
+    "description": "SignalSense is a personal privacy tool that helps you detect signals from devices around you. We don't make absolute promises — we offer awareness.",
     "icon": "./assets/images/icon.png",
     "scheme": "signalsense",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "jsEngine": "hermes",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0B0E11",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.signalsense.app"
+      "predictiveBackGestureEnabled": false,
+      "package": "com.signalsense.app",
+      "icon": "./assets/images/icon.png"
     },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+    "platforms": ["android"],
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0
     },
     "plugins": [
       "expo-router",
+      "expo-sqlite",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/images/icon.png",
+          "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#0B0E11",
+          "backgroundColor": "#E0EAFC",
           "dark": {
-            "backgroundColor": "#0B0E11"
+            "image": "./assets/images/icon.png",
+            "imageWidth": 180,
+            "backgroundColor": "#0C1A30"
           }
         }
       ],
-      "expo-sqlite",
+      "react-native-wifi-reborn",
       [
         "expo-notifications",
         {
@@ -44,11 +55,23 @@
           "color": "#0B0E11"
         }
       ],
-      "react-native-wifi-reborn"
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {}
     }
   }
 }

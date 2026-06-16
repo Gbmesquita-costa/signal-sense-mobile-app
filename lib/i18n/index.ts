@@ -92,10 +92,4 @@ function useI18n() {
   };
 }
 
-export {
-  getIntlLocale,
-  i18n,
-  SUPPORTED_LANGUAGES,
-  SupportedLanguage,
-  useI18n,
-};
+export { getIntlLocale, i18n, SUPPORTED_LANGUAGES, SupportedLanguage, useI18n };

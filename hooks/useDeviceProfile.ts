@@ -80,6 +80,7 @@ function useDeviceProfile(deviceId: string | null) {
 
       setSessions((prev) => [...prev, ...rows]);
       setHasMore(rows.length >= PAGE_SIZE);
+
       cursorRef.current =
         rows.length > 0 ? rows[rows.length - 1].startedAt : undefined;
     } finally {

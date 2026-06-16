@@ -170,7 +170,9 @@ const SettingsScreen = () => {
           >
             <ShieldCheck
               size={18}
-              color={antiStalking.isMonitoring ? theme.success : theme.textSecondary}
+              color={
+                antiStalking.isMonitoring ? theme.success : theme.textSecondary
+              }
               strokeWidth={2}
             />
             <View className="flex-1 ml-3">
@@ -240,15 +242,13 @@ const SettingsScreen = () => {
                         {device.deviceName ?? device.deviceId}
                       </Text>
                       <Pressable
-                        onPress={() => antiStalking.untrustDevice(device.deviceId)}
+                        onPress={() =>
+                          antiStalking.untrustDevice(device.deviceId)
+                        }
                         className="p-1 active:opacity-70"
                         hitSlop={8}
                       >
-                        <Trash2
-                          size={14}
-                          color={theme.error}
-                          strokeWidth={2}
-                        />
+                        <Trash2 size={14} color={theme.error} strokeWidth={2} />
                       </Pressable>
                     </View>
                   ))

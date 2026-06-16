@@ -68,6 +68,7 @@ const WifiRadar = ({
   const animatedCircle1 = useAnimatedStyle(() => {
     const scale = 1 + intensity.value * 0.15;
     const opacity = 0.3 + intensity.value * 0.3;
+
     return {
       transform: [
         { scale: withSpring(scale, { damping: 15, stiffness: 100 }) },
@@ -80,6 +81,7 @@ const WifiRadar = ({
   const animatedCircle2 = useAnimatedStyle(() => {
     const scale = 1.1 + intensity.value * 0.2;
     const opacity = 0.2 + intensity.value * 0.25;
+
     return {
       transform: [{ scale: withSpring(scale, { damping: 15, stiffness: 90 }) }],
       opacity: withSpring(opacity, { damping: 15, stiffness: 90 }),
@@ -90,6 +92,7 @@ const WifiRadar = ({
   const animatedCircle3 = useAnimatedStyle(() => {
     const scale = 1.2 + intensity.value * 0.25;
     const opacity = 0.1 + intensity.value * 0.2;
+
     return {
       transform: [{ scale: withSpring(scale, { damping: 15, stiffness: 80 }) }],
       opacity: withSpring(opacity, { damping: 15, stiffness: 80 }),
@@ -98,8 +101,10 @@ const WifiRadar = ({
   });
 
   const outerSize = size;
+
   const middleSize = size * (176 / 224);
   const innerSize = size * (144 / 224);
+
   const centerSize = size * (112 / 224);
 
   return (

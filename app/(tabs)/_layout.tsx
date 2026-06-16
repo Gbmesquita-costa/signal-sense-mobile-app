@@ -7,6 +7,7 @@ import {
   BookOpen,
   Clock,
   Radar,
+  ScanSearch,
   Settings,
   Wifi,
 } from "lucide-react-native";
@@ -149,6 +150,18 @@ const TabsLayout = () => {
             {t("appName")}
           </Text>
           <View className="flex-row items-center gap-1">
+            <Pressable
+              onPress={() => navigate("/camera-detector")}
+              className="p-2 active:opacity-70"
+              hitSlop={8}
+              accessibilityLabel={t("cameraDetector.title")}
+            >
+              <ScanSearch
+                size={22}
+                color={theme.textSecondary}
+                strokeWidth={2}
+              />
+            </Pressable>
             <Pressable
               onPress={() => navigate("/history")}
               className="p-2 active:opacity-70"

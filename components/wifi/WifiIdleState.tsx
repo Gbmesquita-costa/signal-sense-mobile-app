@@ -39,7 +39,10 @@ const WifiIdleState = ({
     if (!isLoading) {
       scale.value = withRepeat(
         withSequence(
-          withTiming(1.05, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+          withTiming(1.05, {
+            duration: 2000,
+            easing: Easing.inOut(Easing.ease),
+          }),
           withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,

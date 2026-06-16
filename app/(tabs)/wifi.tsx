@@ -12,12 +12,16 @@
  */
 
 import * as Haptics from "expo-haptics";
+
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 
 import {
   AlertTriangle,
+  ChevronRight,
   Crosshair,
   Lightbulb,
+  ScanSearch,
   WifiOff,
 } from "lucide-react-native";
 
@@ -40,10 +44,12 @@ import {
   WifiSignalTracker,
 } from "@/components/wifi";
 
+import { PremiumBadge } from "@/components/premium/PremiumBadge";
 import { PremiumGate } from "@/components/premium/PremiumGate";
 import { useWifi } from "@/hooks/useWifi";
 
 import { useI18n } from "@/lib/i18n";
+import { safePush } from "@/lib/navigation";
 import { useTheme } from "@/theme";
 
 const WifiScreen = () => {
@@ -51,7 +57,13 @@ const WifiScreen = () => {
   const { t } = useI18n();
 
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [isTracking, setIsTracking] = useState<boolean>(false);
+
+  const openCameraDetector = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    safePush(router, "/camera-detector");
+  };
 
   const {
     state,
@@ -349,6 +361,49 @@ const WifiScreen = () => {
             >
               {t("wifi.tracker.trackSignal")}
             </Text>
+          </Pressable>
+        </Animated.View>
+      )}
+
+      {/* Hidden Camera Detector entry (Android only) */}
+      {isAndroid && (
+        <Animated.View
+          className="mb-4"
+          entering={FadeInDown.delay(175).duration(400)}
+        >
+          <Pressable
+            onPress={openCameraDetector}
+            className={`flex-row items-center gap-3 p-4 rounded-2xl ${
+              isDark ? "bg-surface-dark" : "bg-surface"
+            }`}
+            style={{ borderWidth: 1, borderColor: `${theme.error}40` }}
+          >
+            <View
+              className="w-11 h-11 rounded-xl items-center justify-center"
+              style={{ backgroundColor: `${theme.error}1F` }}
+            >
+              <ScanSearch size={22} color={theme.error} strokeWidth={2} />
+            </View>
+            <View className="flex-1">
+              <View className="flex-row items-center gap-2">
+                <Text
+                  className={`text-sm font-bold ${
+                    isDark ? "text-text-primary-dark" : "text-text-primary"
+                  }`}
+                >
+                  {t("cameraDetector.entryTitle")}
+                </Text>
+                <PremiumBadge size="sm" />
+              </View>
+              <Text
+                className={`text-xs mt-0.5 ${
+                  isDark ? "text-text-secondary-dark" : "text-text-secondary"
+                }`}
+              >
+                {t("cameraDetector.entrySubtitle")}
+              </Text>
+            </View>
+            <ChevronRight size={18} color={theme.textSecondary} />
           </Pressable>
         </Animated.View>
       )}

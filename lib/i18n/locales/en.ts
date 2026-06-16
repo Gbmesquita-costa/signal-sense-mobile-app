@@ -53,8 +53,7 @@ export default {
       enable: "Enable Monitoring",
       enableDesc: "Scans for trackers in the background",
       trustedDevices: "Trusted Devices",
-      trustedDevicesDesc:
-        "Devices you marked as safe won't trigger alerts.",
+      trustedDevicesDesc: "Devices you marked as safe won't trigger alerts.",
       noTrustedDevices: "No trusted devices yet.",
     },
 
@@ -119,7 +118,6 @@ export default {
     monitoringLoading: "Initializing monitoring...",
     stopMonitoring: "Stop Monitoring",
     changeDevice: "Change Device",
-    redirecting: "Redirecting...",
 
     // Signal lost
     signalLost: {
@@ -841,8 +839,7 @@ export default {
     notification: {
       title: "Tracking Alert",
       body: "A {type} ({brand}) has been near you for {duration} {unit}.",
-      bodyUnknown:
-        "An unknown device has been near you for {duration} {unit}.",
+      bodyUnknown: "An unknown device has been near you for {duration} {unit}.",
       minute: "minute",
       minutes: "minutes",
     },
@@ -850,8 +847,7 @@ export default {
       startFailed: "Failed to start anti-stalking monitoring",
       notificationPermission:
         "Notification permission is required for tracker alerts",
-      backgroundPermission:
-        "Background location permission is required",
+      backgroundPermission: "Background location permission is required",
     },
   },
 
@@ -859,7 +855,8 @@ export default {
   wifi: {
     idle: {
       tapToStart: "Tap to analyze Wi-Fi",
-      description: "Monitor your Wi-Fi connection in real time with signal strength, frequency, and network details.",
+      description:
+        "Monitor your Wi-Fi connection in real time with signal strength, frequency, and network details.",
       hint: "The app will display your current connection info. Premium users can also scan nearby networks and analyze channels.",
     },
     scanning: "Analyzing network...",
@@ -889,7 +886,8 @@ export default {
       title: "Nearby networks",
       empty: "No networks found",
       scanning: "Scanning nearby networks...",
-      iosNote: "Nearby network scanning requires location permission to detect Wi-Fi networks.",
+      iosNote:
+        "Nearby network scanning requires location permission to detect Wi-Fi networks.",
     },
     channels: {
       title: "Channel analysis",
@@ -899,7 +897,8 @@ export default {
     },
     unavailable: {
       title: "No Connection",
-      message: "You're not connected to any network. Please connect to Wi-Fi and try again.",
+      message:
+        "You're not connected to any network. Please connect to Wi-Fi and try again.",
     },
     error: {
       title: "Error",
@@ -914,6 +913,110 @@ export default {
       graphWaiting: "Collecting signal data...",
       min: "Min",
       max: "Max",
+    },
+  },
+
+  // Camera Detector
+  cameraDetector: {
+    title: "Camera Detector",
+    subtitle: "Find hidden Wi-Fi cameras",
+    entryTitle: "Camera Detector",
+    entrySubtitle: "Sweep for hidden Wi-Fi cameras around you",
+    scanButton: "Start sweep",
+    rescanButton: "Scan again",
+    scanning: "Looking for devices around you...",
+    hiddenSsid: "Hidden network",
+    footer:
+      "This tool reduces risk, it does not guarantee safety. No app catches every camera — pair it with a physical search (lens glare, suspicious holes, out-of-place objects).",
+    intro: {
+      title: "Sweep for hidden cameras",
+      body: "Spy cameras in hotel rooms and Airbnbs almost always use Wi-Fi. This sweep helps you locate them using your phone's sensors.",
+      disclaimer:
+        "Honest result: we flag suspicious devices, we never claim 'you are safe'. An ordinary router can show up too — use your judgment.",
+      tips: {
+        wifi: {
+          title: "Cameras with their own Wi-Fi",
+          body: "We detect and locate by proximity any camera that broadcasts its own network.",
+        },
+        network: {
+          title: "Cameras on the venue network",
+          body: "We look for cameras already joined to the Wi-Fi (RTSP/ONVIF ports). Detects presence, not location.",
+        },
+        physical: {
+          title: "Physical search",
+          body: "Check for lens reflections, outlets, smoke detectors and objects pointed at the bed.",
+        },
+      },
+    },
+    suspicion: {
+      high: "High suspicion",
+      medium: "Medium suspicion",
+      low: "Low suspicion",
+      none: "Ordinary",
+    },
+    reasons: {
+      knownVendor: "Camera vendor",
+      ssidPattern: "Suspicious name",
+      hiddenSsid: "Hidden network",
+      openNetwork: "Open network",
+      strongSignalClose: "Very strong signal (close)",
+    },
+    results: {
+      suspectsTitle: "Suspicious nearby APs",
+      suspectsSubtitle:
+        "Sorted by suspicion and signal. Tap one to hunt it by proximity.",
+      noSuspects:
+        "No nearby networks found. Turn on Wi-Fi and location, then try again.",
+      networkTitle: "Cameras on the network",
+      networkSubtitle:
+        "Looks for cameras joined to your current Wi-Fi (you must be on the same network).",
+      networkScanButton: "Scan the network",
+      networkRescan: "Scan again",
+      networkScanning: "Sweeping the network...",
+      networkNone: "No camera-like devices found on the network.",
+      networkUnavailable:
+        "Unavailable right now. Connect to Wi-Fi — and this feature turns on after you update the app.",
+      networkError: "Could not sweep the network. Try again.",
+    },
+    hostKind: {
+      camera: "Possible camera",
+      nvr: "Possible recorder (NVR/DVR)",
+      generic: "Device with a camera port",
+    },
+    host: {
+      ports: "Ports",
+    },
+    hunt: {
+      estimatedDistance: "Estimated distance",
+      approximation: "Approximate estimate by RSSI",
+      rssiTitle: "Live signal",
+      back: "Back to list",
+      throttleNote:
+        "Android limits how often Wi-Fi can be scanned, so the distance updates every few seconds. Move slowly to feel the signal get warmer or colder.",
+      guidance: {
+        near: "🔥 Very close — search here!",
+        medium: "Getting warmer — keep moving.",
+        far: "Cold — move away in that direction.",
+        unknown: "Searching for the signal...",
+      },
+    },
+    errors: {
+      locationOff: {
+        title: "Turn on location",
+        message:
+          "Android requires location to be on in order to scan nearby Wi-Fi networks.",
+      },
+      notAndroid: {
+        title: "Android only",
+        message:
+          "Wi-Fi scanning is only available on Android. iOS does not allow this access.",
+      },
+      scanFailed: {
+        title: "Sweep failed",
+        message: "Could not scan the networks. Try again.",
+      },
+      openSettings: "Open settings",
+      retry: "Try again",
     },
   },
 

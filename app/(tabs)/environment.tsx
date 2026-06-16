@@ -11,8 +11,8 @@
  * 5. Error - Error accessing sensor
  */
 
-import * as Haptics from "expo-haptics";
 import React from "react";
+import * as Haptics from "expo-haptics";
 
 import {
   AlertTriangle,

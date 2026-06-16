@@ -86,6 +86,7 @@ class HistoryService {
       `DELETE FROM session_devices WHERE session_id = ?`,
       [id],
     );
+
     await databaseService.execute(`DELETE FROM scan_sessions WHERE id = ?`, [
       id,
     ]);
@@ -168,6 +169,7 @@ class HistoryService {
       id: string;
       custom_name: string;
     }>(`SELECT id, custom_name FROM devices WHERE custom_name IS NOT NULL`);
+
     return new Map(rows.map((r) => [r.id, r.custom_name]));
   }
 
@@ -493,9 +495,11 @@ class HistoryService {
         environment: "environment_sessions",
         wifi: "wifi_sessions",
       };
+
       const result = await databaseService.getFirst<{ count: number }>(
         `SELECT COUNT(*) as count FROM ${tableMap[type]}`,
       );
+
       return result?.count ?? 0;
     }
 
@@ -506,6 +510,7 @@ class HistoryService {
         (SELECT COUNT(*) FROM environment_sessions) +
         (SELECT COUNT(*) FROM wifi_sessions) as count`,
     );
+
     return result?.count ?? 0;
   }
 

@@ -2,9 +2,11 @@
   "name": "signal-sense",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
+    "generate:icons": "node scripts/generate-android-icons.mjs",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
@@ -23,7 +25,9 @@
     "@react-navigation/material-top-tabs": "^7.4.13",
     "@react-navigation/native": "^7.1.8",
     "@shopify/flash-list": "^2.2.0",
+    "babel-preset-expo": "~54.0.10",
     "expo": "~54.0.31",
+    "expo-build-properties": "~1.0.10",
     "expo-constants": "~18.0.13",
     "expo-dev-client": "~6.0.20",
     "expo-device": "^8.0.10",
@@ -62,8 +66,11 @@
     "react-native-screens": "~4.16.0",
     "react-native-svg": "15.12.1",
     "react-native-tab-view": "^4.2.2",
+    "react-native-tcp-socket": "^6.4.1",
     "react-native-web": "~0.21.0",
     "react-native-wifi-reborn": "^4.13.6",
+    "react-native-worklets": "0.5.1",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.17",
     "zustand": "^5.0.10"
   },
@@ -72,6 +79,5 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "typescript": "~5.9.2"
-  },
-  "private": true
+  }
 }

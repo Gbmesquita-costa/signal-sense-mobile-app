@@ -340,6 +340,7 @@ class BleManagerService {
     }
 
     this.isScanning = false;
+
     this.pendingUpdates.clear();
     this.lastStopTime = Date.now();
   }
@@ -416,7 +417,11 @@ class BleManagerService {
     }
 
     // === PHASE 2: Direct connection (fast — 8s timeout) ===
-    const directResult = await this.tryConnectAndReadName(rawBleId, 8_000, false);
+    const directResult = await this.tryConnectAndReadName(
+      rawBleId,
+      8_000,
+      false,
+    );
     if (directResult.name) return directResult.name;
 
     // If direct connection succeeded but no name found, don't retry with autoConnect
@@ -429,7 +434,11 @@ class BleManagerService {
     // more reliable for devices that reject direct BLE connections (e.g.
     // Classic Bluetooth headphones that also advertise via BLE)
     if (Platform.OS === "android") {
-      const autoResult = await this.tryConnectAndReadName(rawBleId, 10_000, true);
+      const autoResult = await this.tryConnectAndReadName(
+        rawBleId,
+        10_000,
+        true,
+      );
       if (autoResult.name) return autoResult.name;
       if (autoResult.connected) return null;
     }
@@ -454,10 +463,7 @@ class BleManagerService {
       const device = await Promise.race([
         this.manager!.connectToDevice(rawBleId, { autoConnect }),
         new Promise<never>((_, reject) =>
-          setTimeout(
-            () => reject(new Error("CONNECTION_TIMEOUT")),
-            timeoutMs,
-          ),
+          setTimeout(() => reject(new Error("CONNECTION_TIMEOUT")), timeoutMs),
         ),
       ]);
       connected = true;
@@ -480,7 +486,11 @@ class BleManagerService {
       // Try GAP Device Name (0x2A00)
       const GAP_SERVICE = "00001800-0000-1000-8000-00805f9b34fb";
       const DEVICE_NAME_CHAR = "00002a00-0000-1000-8000-00805f9b34fb";
-      const gapName = await this.tryReadCharacteristic(rawBleId, GAP_SERVICE, DEVICE_NAME_CHAR);
+      const gapName = await this.tryReadCharacteristic(
+        rawBleId,
+        GAP_SERVICE,
+        DEVICE_NAME_CHAR,
+      );
       if (gapName) return { name: gapName, connected: true };
 
       // Try Device Information Service (0x180A)
@@ -488,10 +498,18 @@ class BleManagerService {
       const MODEL_CHAR = "00002a24-0000-1000-8000-00805f9b34fb";
       const MFG_CHAR = "00002a29-0000-1000-8000-00805f9b34fb";
 
-      const modelName = await this.tryReadCharacteristic(rawBleId, DIS_SERVICE, MODEL_CHAR);
+      const modelName = await this.tryReadCharacteristic(
+        rawBleId,
+        DIS_SERVICE,
+        MODEL_CHAR,
+      );
       if (modelName) return { name: modelName, connected: true };
 
-      const mfgName = await this.tryReadCharacteristic(rawBleId, DIS_SERVICE, MFG_CHAR);
+      const mfgName = await this.tryReadCharacteristic(
+        rawBleId,
+        DIS_SERVICE,
+        MFG_CHAR,
+      );
       if (mfgName) return { name: mfgName, connected: true };
 
       // Scan all readable characteristics
@@ -536,7 +554,9 @@ class BleManagerService {
         return decoded;
       }
       // Fallback: if it has at least some printable chars
-      const printable = decoded.replace(/[^\x20-\x7E\u00C0-\u024F]/g, "").trim();
+      const printable = decoded
+        .replace(/[^\x20-\x7E\u00C0-\u024F]/g, "")
+        .trim();
       return printable.length >= 2 ? printable : null;
     } catch {
       return null;
@@ -552,8 +572,10 @@ class BleManagerService {
     try {
       const services = await this.manager!.servicesForDevice(deviceId);
       for (const service of services) {
-        const chars =
-          await this.manager!.characteristicsForDevice(deviceId, service.uuid);
+        const chars = await this.manager!.characteristicsForDevice(
+          deviceId,
+          service.uuid,
+        );
         for (const char of chars) {
           if (!char.isReadable) continue;
           try {

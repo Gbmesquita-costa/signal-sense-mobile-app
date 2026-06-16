@@ -37,6 +37,7 @@ const WifiSignalBar = ({
   t,
 }: WifiSignalBarProps) => {
   const color = wifiService.getSignalColor(quality, theme);
+
   const percentage = Math.max(0, Math.min(100, strength ?? 0));
   const description = t(`wifi.signal.${quality}`);
 

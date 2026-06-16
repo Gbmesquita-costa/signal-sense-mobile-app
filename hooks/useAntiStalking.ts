@@ -70,6 +70,7 @@ function useAntiStalking() {
       if (alertsResult.status === "fulfilled") {
         setAlerts(alertsResult.value);
       }
+
       if (trustedResult.status === "fulfilled") {
         setTrustedDevices(trustedResult.value);
       }
@@ -168,6 +169,7 @@ function useAntiStalking() {
     async (alertId: string) => {
       const alert = alerts.find((a) => a.id === alertId);
       storeDismissAlert(alertId);
+
       await stalkerRepository.dismissAlert(alertId).catch(() => {});
       if (alert) {
         stalkerDetectionService.markDismissed(alert.deviceId);

@@ -13,6 +13,7 @@ import type { ProximityConfig, ProximityLevel } from "./proximity.types";
  */
 let cachedTxPower: number | null = null;
 let samplesSinceCal = 0;
+
 const CAL_INTERVAL = 30; // Recalibrate every 30 new samples (not every update)
 
 function calibrateTxPower(
@@ -24,18 +25,19 @@ function calibrateTxPower(
   }
 
   samplesSinceCal++;
+
   if (cachedTxPower !== null && samplesSinceCal < CAL_INTERVAL) {
     return cachedTxPower;
   }
+
   samplesSinceCal = 0;
 
   // Use median for robustness
   const sorted = [...rssiHistory].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
+
   const medianRssi =
-    sorted.length % 2 === 0
-      ? (sorted[mid - 1] + sorted[mid]) / 2
-      : sorted[mid];
+    sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
 
   const environmentFactor = 3.0;
   const calibratedTxPower =
@@ -116,6 +118,7 @@ function rssiToDistance(
   } else if (roughDistance > 12) {
     targetFactor = Math.min(4.0, environmentFactor + 0.5);
   }
+
   // Smooth transition instead of instant jump
   currentEnvFactor = 0.95 * currentEnvFactor + 0.05 * targetFactor;
 

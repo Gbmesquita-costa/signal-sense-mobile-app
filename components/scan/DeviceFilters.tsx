@@ -4,7 +4,7 @@
  * Premium-gated feature
  */
 
-import { memo, useCallback } from "react";
+import React, { memo, useCallback } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import {
@@ -75,6 +75,7 @@ const DeviceFilters = memo(function DeviceFilters({
   const handleSortCycle = useCallback(() => {
     const currentIndex = SORT_CYCLE.indexOf(filters.sortBy);
     const nextIndex = (currentIndex + 1) % SORT_CYCLE.length;
+
     updateFilter("sortBy", SORT_CYCLE[nextIndex]);
   }, [filters.sortBy, updateFilter]);
 
@@ -256,10 +257,9 @@ const FilterChip = memo(function FilterChip({
       }}
       onPress={onPress}
     >
-      {React.cloneElement(
-        icon as React.ReactElement<{ color: string }>,
-        { color: active ? activeColor : theme.textSecondary },
-      )}
+      {React.cloneElement(icon as React.ReactElement<{ color: string }>, {
+        color: active ? activeColor : theme.textSecondary,
+      })}
       <Text
         className="text-xs font-medium"
         style={{ color: active ? activeColor : theme.textSecondary }}
@@ -269,8 +269,5 @@ const FilterChip = memo(function FilterChip({
     </Pressable>
   );
 });
-
-// Need React import for cloneElement
-import React from "react";
 
 export { DeviceFilters };

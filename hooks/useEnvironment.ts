@@ -95,6 +95,7 @@ function useEnvironment(): UseEnvironmentReturn {
 
   // Haptic debounce — minimum 800ms between haptic events
   const lastHapticTimeRef = useRef(0);
+
   // Status throttle — minimum 500ms between React state updates
   const lastStatusUpdateRef = useRef(0);
   const pendingStatusRef = useRef<EnvironmentStatus | null>(null);
@@ -152,6 +153,7 @@ function useEnvironment(): UseEnvironmentReturn {
         // Update shared values ​​directly (without re-rendering)
         if (newState.data) {
           magnitude.value = newState.data.magnitude;
+
           x.value = newState.data.x;
           y.value = newState.data.y;
           z.value = newState.data.z;
@@ -173,6 +175,7 @@ function useEnvironment(): UseEnvironmentReturn {
             x: newState.data.x,
             y: newState.data.y,
             z: newState.data.z,
+
             magnitude: newState.data.magnitude,
             status: currentStatusRef.current,
           });
@@ -204,8 +207,10 @@ function useEnvironment(): UseEnvironmentReturn {
             if (!statusTimerRef.current) {
               statusTimerRef.current = setTimeout(() => {
                 statusTimerRef.current = null;
+
                 if (pendingStatusRef.current) {
                   lastStatusUpdateRef.current = Date.now();
+
                   setStatus(pendingStatusRef.current);
                   pendingStatusRef.current = null;
                 }

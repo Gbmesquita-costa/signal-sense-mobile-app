@@ -150,7 +150,11 @@ const StalkerAlertCard = memo(function StalkerAlertCard({
               isDark ? "bg-background-dark" : "bg-gray-100"
             }`}
           >
-            <CheckCircle size={14} color={theme.textSecondary} strokeWidth={2} />
+            <CheckCircle
+              size={14}
+              color={theme.textSecondary}
+              strokeWidth={2}
+            />
             <Text
               className={`text-xs font-medium ml-1.5 ${
                 isDark ? "text-text-secondary-dark" : "text-text-secondary"

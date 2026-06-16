@@ -14,7 +14,6 @@ const usePremiumStore = create<PremiumStore>((set) => ({
   isPremium: __DEV__, // remove — forces premium ON in dev builds only
   isLoading: true,
   priceString: null,
-
   setIsPremium: (value) => set({ isPremium: value }),
   setLoading: (value) => set({ isLoading: value }),
   setPriceString: (value) => set({ priceString: value }),

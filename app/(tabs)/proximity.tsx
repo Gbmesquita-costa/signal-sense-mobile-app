@@ -3,8 +3,8 @@
  * Monitors proximity to a selected device
  */
 
-import { AlertCircle, Bluetooth, MapPin } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { AlertCircle, Bluetooth, MapPin } from "lucide-react-native";
 
 import * as Haptics from "expo-haptics";
 import {

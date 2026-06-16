@@ -1,7 +1,10 @@
 import { FlashList } from "@shopify/flash-list";
 import { memo, useCallback } from "react";
 
-import type { SessionType, UnifiedSession } from "@/services/history/history.types";
+import type {
+  SessionType,
+  UnifiedSession,
+} from "@/services/history/history.types";
 import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 
 import { SessionCard } from "./SessionCard";

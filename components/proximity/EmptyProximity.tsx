@@ -3,15 +3,14 @@
  * Empty state when no device is selected
  */
 
-import { useTransition } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useRef } from "react";
+import { Pressable, Text, View } from "react-native";
 
 import { router } from "expo-router";
 import { Lock } from "lucide-react-native";
 
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import { useI18n } from "@/lib/i18n";
 import { useTheme } from "@/theme";
 
 interface EmptyProximityProps {
@@ -28,14 +27,19 @@ const EmptyProximity = ({
   isDark = false,
 }: EmptyProximityProps) => {
   const { theme } = useTheme();
-  const { t } = useI18n();
 
-  const [isPending, startTransition] = useTransition();
+  // Guard against double-taps; navigation itself is instant (expo-router
+  // handles the transition animation), so no pending/loading state is needed.
+  const navigatingRef = useRef(false);
 
   const handleGoToScan = () => {
-    startTransition(() => {
-      router.push("/(tabs)/scan");
-    });
+    if (navigatingRef.current) return;
+    navigatingRef.current = true;
+
+    router.push("/(tabs)/scan");
+    setTimeout(() => {
+      navigatingRef.current = false;
+    }, 600);
   };
 
   return (
@@ -69,26 +73,11 @@ const EmptyProximity = ({
 
       <Pressable
         onPress={handleGoToScan}
-        disabled={isPending}
-        className="px-8 py-4 rounded-xl flex-row 
-        items-center justify-center min-w-[200px]"
-        style={{
-          backgroundColor: theme.primary,
-          opacity: isPending ? 0.7 : 1,
-        }}
+        className="px-8 py-4 rounded-xl flex-row
+        items-center justify-center min-w-[200px] active:opacity-80"
+        style={{ backgroundColor: theme.primary }}
       >
-        {isPending ? (
-          <>
-            <Text className="text-white font-semibold text-base">
-              {t("proximity.redirecting")}
-            </Text>
-            <ActivityIndicator size="small" color="#FFFFFF" className="ml-3" />
-          </>
-        ) : (
-          <Text className="text-white font-semibold text-base">
-            {buttonText}
-          </Text>
-        )}
+        <Text className="text-white font-semibold text-base">{buttonText}</Text>
       </Pressable>
     </Animated.View>
   );

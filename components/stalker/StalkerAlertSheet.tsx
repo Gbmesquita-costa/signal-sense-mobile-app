@@ -1,11 +1,11 @@
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { Pressable, Text, View } from "react-native";
+
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
-import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -256,7 +256,8 @@ const StalkerAlertSheet = memo(function StalkerAlertSheet({
                 >
                   <Pressable
                     onPress={() => onDismiss(alert.id)}
-                    className="flex-1 flex-row items-center justify-center py-2 rounded-lg active:opacity-70"
+                    className="flex-1 flex-row items-center 
+                    justify-center py-2 rounded-lg active:opacity-70"
                   >
                     <CheckCircle
                       size={14}
@@ -278,7 +279,8 @@ const StalkerAlertSheet = memo(function StalkerAlertSheet({
                     onPress={() =>
                       onTrustDevice(alert.deviceId, alert.deviceName)
                     }
-                    className="flex-1 flex-row items-center justify-center py-2 rounded-lg active:opacity-70"
+                    className="flex-1 flex-row items-center 
+                    justify-center py-2 rounded-lg active:opacity-70"
                     style={{ backgroundColor: `${theme.success}10` }}
                   >
                     <ShieldCheck

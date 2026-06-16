@@ -20,7 +20,6 @@ const ExportSection = memo(function ExportSection({
   t,
 }: ExportSectionProps) {
   const { theme, isDark } = useTheme();
-
   const isAnyExporting = isExportingSessions || isExportingDevices;
 
   return (

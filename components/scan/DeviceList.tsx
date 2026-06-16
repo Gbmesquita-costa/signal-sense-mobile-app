@@ -86,7 +86,15 @@ const DeviceList = memo(function DeviceList({
         onLongPress={() => onLongPressDevice?.(item)}
       />
     ),
-    [isDark, isPremium, customNames, theme, t, onSelectDevice, onLongPressDevice],
+    [
+      isDark,
+      isPremium,
+      customNames,
+      theme,
+      t,
+      onSelectDevice,
+      onLongPressDevice,
+    ],
   );
 
   // Separator between items

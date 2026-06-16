@@ -10,6 +10,7 @@ class DatabaseService {
 
   async initialize(): Promise<void> {
     if (this.db) return;
+
     // Dedupe concurrent initialize() calls so we never open the DB twice
     // (which leaks the first handle and causes NullPointerExceptions later).
     if (this.initPromise) return this.initPromise;
@@ -17,6 +18,7 @@ class DatabaseService {
     this.initPromise = (async () => {
       try {
         this.db = await SQLite.openDatabaseAsync(DB_NAME);
+
         await this.db.execAsync("PRAGMA journal_mode = WAL;");
         await this.runMigrations();
       } catch (err) {
@@ -153,6 +155,7 @@ class DatabaseService {
     } catch (err) {
       if (!this.isStaleConnectionError(err)) throw err;
       this.db = null;
+
       await this.initialize();
       return op(this.getDb());
     }
@@ -163,9 +166,7 @@ class DatabaseService {
   }
 
   async query<T>(sql: string, params: BindValue[] = []): Promise<T[]> {
-    return this.withRetry(
-      (db) => db.getAllAsync(sql, params) as Promise<T[]>,
-    );
+    return this.withRetry((db) => db.getAllAsync(sql, params) as Promise<T[]>);
   }
 
   async getFirst<T>(sql: string, params: BindValue[] = []): Promise<T | null> {

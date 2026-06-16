@@ -123,7 +123,6 @@ export default {
     monitoringLoading: "Inicializando monitoreo...",
     stopMonitoring: "Detener Monitoreo",
     changeDevice: "Cambiar Dispositivo",
-    redirecting: "Redirigiendo...",
 
     // Señal perdida
     signalLost: {
@@ -856,8 +855,7 @@ export default {
       startFailed: "Error al iniciar el monitoreo anti-rastreo",
       notificationPermission:
         "Se requiere permiso de notificaciones para alertas de rastreadores",
-      backgroundPermission:
-        "Se requiere permiso de ubicación en segundo plano",
+      backgroundPermission: "Se requiere permiso de ubicación en segundo plano",
     },
   },
 
@@ -865,7 +863,8 @@ export default {
   wifi: {
     idle: {
       tapToStart: "Toca para analizar Wi-Fi",
-      description: "Monitorea tu conexión Wi-Fi en tiempo real con intensidad de señal, frecuencia y detalles de red.",
+      description:
+        "Monitorea tu conexión Wi-Fi en tiempo real con intensidad de señal, frecuencia y detalles de red.",
       hint: "La app mostrará la información de tu conexión actual. Los usuarios premium también pueden escanear redes cercanas y analizar canales.",
     },
     scanning: "Analizando red...",
@@ -895,7 +894,8 @@ export default {
       title: "Redes cercanas",
       empty: "No se encontraron redes",
       scanning: "Escaneando redes cercanas...",
-      iosNote: "El escaneo de redes cercanas requiere permiso de ubicación para detectar redes Wi-Fi.",
+      iosNote:
+        "El escaneo de redes cercanas requiere permiso de ubicación para detectar redes Wi-Fi.",
     },
     channels: {
       title: "Análisis de canales",
@@ -905,7 +905,8 @@ export default {
     },
     unavailable: {
       title: "Sin Conexión",
-      message: "No estás conectado a ninguna red. Conéctate a Wi-Fi e inténtalo de nuevo.",
+      message:
+        "No estás conectado a ninguna red. Conéctate a Wi-Fi e inténtalo de nuevo.",
     },
     error: {
       title: "Error",
@@ -920,6 +921,110 @@ export default {
       graphWaiting: "Recopilando datos de señal...",
       min: "Mín",
       max: "Máx",
+    },
+  },
+
+  // Camera Detector
+  cameraDetector: {
+    title: "Detector de Cámaras",
+    subtitle: "Encuentra cámaras Wi-Fi ocultas",
+    entryTitle: "Detector de Cámaras",
+    entrySubtitle: "Rastrea cámaras Wi-Fi ocultas a tu alrededor",
+    scanButton: "Iniciar búsqueda",
+    rescanButton: "Escanear de nuevo",
+    scanning: "Buscando dispositivos a tu alrededor...",
+    hiddenSsid: "Red oculta",
+    footer:
+      "Esta herramienta reduce el riesgo, no garantiza seguridad. Ninguna app detecta toda cámara — combínala con una búsqueda física (reflejo de lente, orificios sospechosos, objetos fuera de lugar).",
+    intro: {
+      title: "Busca cámaras ocultas",
+      body: "Las cámaras espía en hoteles y Airbnbs casi siempre usan Wi-Fi. Esta búsqueda te ayuda a localizarlas con los sensores de tu teléfono.",
+      disclaimer:
+        "Resultado honesto: señalamos dispositivos sospechosos, nunca afirmamos 'estás seguro'. Un router común también puede aparecer — usa el sentido común.",
+      tips: {
+        wifi: {
+          title: "Cámaras con su propio Wi-Fi",
+          body: "Detectamos y ubicamos por proximidad las cámaras que emiten su propia red.",
+        },
+        network: {
+          title: "Cámaras en la red del lugar",
+          body: "Buscamos cámaras ya conectadas al Wi-Fi (puertos RTSP/ONVIF). Detecta presencia, no ubicación.",
+        },
+        physical: {
+          title: "Búsqueda física",
+          body: "Revisa reflejos de lente, enchufes, detectores de humo y objetos apuntados a la cama.",
+        },
+      },
+    },
+    suspicion: {
+      high: "Alta sospecha",
+      medium: "Sospecha media",
+      low: "Baja sospecha",
+      none: "Común",
+    },
+    reasons: {
+      knownVendor: "Fabricante de cámaras",
+      ssidPattern: "Nombre sospechoso",
+      hiddenSsid: "Red oculta",
+      openNetwork: "Red abierta",
+      strongSignalClose: "Señal muy fuerte (cerca)",
+    },
+    results: {
+      suspectsTitle: "APs cercanos sospechosos",
+      suspectsSubtitle:
+        "Ordenados por sospecha y señal. Toca uno para rastrearlo por proximidad.",
+      noSuspects:
+        "No se encontraron redes cercanas. Activa el Wi-Fi y la ubicación e inténtalo de nuevo.",
+      networkTitle: "Cámaras en la red",
+      networkSubtitle:
+        "Busca cámaras conectadas a tu Wi-Fi actual (debes estar en la misma red).",
+      networkScanButton: "Escanear la red",
+      networkRescan: "Escanear de nuevo",
+      networkScanning: "Rastreando la red...",
+      networkNone: "No se encontraron dispositivos parecidos a cámaras en la red.",
+      networkUnavailable:
+        "No disponible ahora. Conéctate al Wi-Fi — y esta función se activa al actualizar la app.",
+      networkError: "No se pudo rastrear la red. Inténtalo de nuevo.",
+    },
+    hostKind: {
+      camera: "Posible cámara",
+      nvr: "Posible grabador (NVR/DVR)",
+      generic: "Dispositivo con puerto de cámara",
+    },
+    host: {
+      ports: "Puertos",
+    },
+    hunt: {
+      estimatedDistance: "Distancia estimada",
+      approximation: "Estimación aproximada por RSSI",
+      rssiTitle: "Señal en vivo",
+      back: "Volver a la lista",
+      throttleNote:
+        "Android limita la frecuencia de escaneo de Wi-Fi, así que la distancia se actualiza cada pocos segundos. Camina despacio para sentir si la señal se calienta o enfría.",
+      guidance: {
+        near: "🔥 Muy cerca — ¡busca aquí!",
+        medium: "Calentando — sigue caminando.",
+        far: "Frío — aléjate en esa dirección.",
+        unknown: "Buscando la señal...",
+      },
+    },
+    errors: {
+      locationOff: {
+        title: "Activa la ubicación",
+        message:
+          "Android exige la ubicación activada para escanear redes Wi-Fi cercanas.",
+      },
+      notAndroid: {
+        title: "Solo en Android",
+        message:
+          "El escaneo de Wi-Fi solo está disponible en Android. iOS no permite este acceso.",
+      },
+      scanFailed: {
+        title: "Falló la búsqueda",
+        message: "No se pudieron escanear las redes. Inténtalo de nuevo.",
+      },
+      openSettings: "Abrir ajustes",
+      retry: "Reintentar",
     },
   },
 

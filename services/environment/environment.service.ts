@@ -48,7 +48,6 @@ class EnvironmentService {
     if (this.subscription) return;
 
     this.currentStatus = "stable";
-
     Magnetometer.setUpdateInterval(UPDATE_INTERVAL);
 
     this.subscription = Magnetometer.addListener((data) => {

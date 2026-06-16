@@ -35,10 +35,8 @@ const useAntiStalkingStore = create<AntiStalkingStore>((set) => ({
   alerts: [],
   trustedDevices: [],
   error: null,
-
   setState: (state) => set({ state }),
-  setConfig: (partial) =>
-    set((s) => ({ config: { ...s.config, ...partial } })),
+  setConfig: (partial) => set((s) => ({ config: { ...s.config, ...partial } })),
   setAlerts: (alerts) => set({ alerts }),
   addAlert: (alert) => set((s) => ({ alerts: [alert, ...s.alerts] })),
   dismissAlert: (alertId) =>

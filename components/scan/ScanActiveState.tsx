@@ -15,8 +15,10 @@ import type { DeviceFilters as DeviceFiltersType } from "@/hooks/useDeviceFilter
 
 import { PremiumGate } from "@/components/premium/PremiumGate";
 import { AntiStalkingToggle, StalkerAlertBanner } from "@/components/stalker";
+
 import { DeviceFilters } from "./DeviceFilters";
 import { DeviceList } from "./DeviceList";
+
 import { RadarAnimation } from "./RadarAnimation";
 
 interface ScanActiveStateProps {

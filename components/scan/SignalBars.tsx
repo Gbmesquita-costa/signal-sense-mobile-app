@@ -12,7 +12,10 @@ interface SignalBarsProps {
   color: string;
 }
 
-const SignalBars = memo(function SignalBars({ strength, color }: SignalBarsProps) {
+const SignalBars = memo(function SignalBars({
+  strength,
+  color,
+}: SignalBarsProps) {
   const bars = strength === "strong" ? 3 : strength === "medium" ? 2 : 1;
 
   return (

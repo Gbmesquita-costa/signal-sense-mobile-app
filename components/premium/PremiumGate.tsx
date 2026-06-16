@@ -58,9 +58,7 @@ function PremiumGateFallback({
   return (
     <View
       className={`p-4 items-center ${
-        inline
-          ? ""
-          : `rounded-2xl ${isDark ? "bg-surface-dark" : "bg-surface"}`
+        inline ? "" : `rounded-2xl ${isDark ? "bg-surface-dark" : "bg-surface"}`
       }`}
       style={
         inline

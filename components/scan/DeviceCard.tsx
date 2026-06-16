@@ -43,7 +43,6 @@ const DeviceCard = memo(function DeviceCard({
   onPress,
   onLongPress,
 }: DeviceCardProps) {
-
   // Display name: customName (SQLite) > BLE name > localName > fallback
   const displayName =
     customName ||

@@ -143,6 +143,7 @@ class PremiumService {
     } catch {
       // Silently fail cache read
     }
+
     return { isPremium: false, expirationDate: null, productId: null };
   }
 }

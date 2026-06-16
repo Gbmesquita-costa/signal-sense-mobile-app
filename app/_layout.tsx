@@ -120,6 +120,12 @@ function RootLayoutContent() {
             animation: "slide_from_bottom",
           }}
         />
+        <Stack.Screen
+          name="camera-detector"
+          options={{
+            animation: "slide_from_right",
+          }}
+        />
       </Stack>
     </>
   );

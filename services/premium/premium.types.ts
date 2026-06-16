@@ -22,7 +22,8 @@ type PremiumFeature =
   | "anti_stalking_config"
   | "wifi_networks"
   | "wifi_channel_analysis"
-  | "wifi_signal_graph";
+  | "wifi_signal_graph"
+  | "camera_detector";
 
 const REVENUECAT_API_KEY_ANDROID =
   process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID ?? "";

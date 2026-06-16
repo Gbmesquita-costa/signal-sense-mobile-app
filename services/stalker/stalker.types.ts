@@ -57,15 +57,21 @@ interface AntiStalkingConfig {
   dismissCooldownMs: number;
 }
 
+const PROD_ANTI_STALKING_CONFIG = {
+  timeWindowMs: 15 * 60 * 1000,
+  minSightings: 5,
+  dismissCooldownMs: 30 * 60 * 1000,
+};
+
+const DEV_ANTI_STALKING_CONFIG = {
+  timeWindowMs: 1 * 60 * 1000,
+  minSightings: 2,
+  dismissCooldownMs: 1 * 60 * 1000,
+};
+
 const DEFAULT_ANTI_STALKING_CONFIG: AntiStalkingConfig = {
   enabled: false,
-  // TODO: Revert to production values after testing
-  // timeWindowMs: 15 * 60 * 1000, // 15 minutes
-  // minSightings: 5,
-  // dismissCooldownMs: 30 * 60 * 1000, // 30 minutes
-  timeWindowMs: 1 * 60 * 1000, // 1 minute (TESTING)
-  minSightings: 2, // (TESTING)
-  dismissCooldownMs: 1 * 60 * 1000, // 1 minute (TESTING)
+  ...(__DEV__ ? DEV_ANTI_STALKING_CONFIG : PROD_ANTI_STALKING_CONFIG),
   rssiThreshold: -85,
   scanIntervalMs: 30_000,
   scanDurationMs: 8_000,

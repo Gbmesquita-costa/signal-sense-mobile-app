@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import * as Haptics from "expo-haptics";
+
 import { Shield, ShieldCheck } from "lucide-react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
@@ -47,7 +48,8 @@ const AntiStalkingToggle = memo(function AntiStalkingToggle({
         <Icon size={22} color={iconColor} strokeWidth={2} />
         {activeAlertCount > 0 && (
           <View
-            className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full items-center justify-center px-1"
+            className="absolute -top-0.5 -right-0.5 min-w-[16px] 
+            h-4 rounded-full items-center justify-center px-1"
             style={{ backgroundColor: theme.error }}
           >
             <Text className="text-[10px] font-bold text-white">
@@ -104,7 +106,8 @@ const AntiStalkingToggle = memo(function AntiStalkingToggle({
 
         {activeAlertCount > 0 && (
           <View
-            className="min-w-[22px] h-[22px] rounded-full items-center justify-center px-1.5 mr-2"
+            className="min-w-[22px] h-[22px] rounded-full 
+            items-center justify-center px-1.5 mr-2"
             style={{ backgroundColor: theme.error }}
           >
             <Text className="text-[11px] font-bold text-white">
@@ -118,7 +121,9 @@ const AntiStalkingToggle = memo(function AntiStalkingToggle({
             isMonitoring ? "" : ""
           }`}
           style={{
-            backgroundColor: isMonitoring ? theme.success : `${theme.textSecondary}30`,
+            backgroundColor: isMonitoring
+              ? theme.success
+              : `${theme.textSecondary}30`,
           }}
         >
           <View

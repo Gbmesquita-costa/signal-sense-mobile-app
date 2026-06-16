@@ -7,6 +7,12 @@ export { useScan } from "./useScan";
 // Proximity hooks
 export { useProximity } from "./useProximity";
 
+// Camera detector hook
+export {
+  useCameraDetector,
+  type UseCameraDetectorReturn,
+} from "./useCameraDetector";
+
 // History & Profile hooks
 export { useHistory } from "./useHistory";
 export { useDeviceProfile } from "./useDeviceProfile";

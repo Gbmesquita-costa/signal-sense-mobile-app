@@ -64,11 +64,14 @@ const WifiNetworkList = ({
   const sorted = [...networks].sort((a, b) => {
     if (a.isConnected && !b.isConnected) return -1;
     if (!a.isConnected && b.isConnected) return 1;
+
     return b.rssi - a.rssi;
   });
 
   return (
-    <View className={`rounded-2xl ${isDark ? "bg-surface-dark" : "bg-surface"}`}>
+    <View
+      className={`rounded-2xl ${isDark ? "bg-surface-dark" : "bg-surface"}`}
+    >
       {/* Header */}
       <View className="flex-row items-center justify-between p-4 pb-2">
         <Text
@@ -173,14 +176,18 @@ const WifiNetworkList = ({
                   <View className="flex-row items-center gap-2 mt-0.5">
                     <Text
                       className={`text-[10px] ${
-                        isDark ? "text-text-tertiary-dark" : "text-text-tertiary"
+                        isDark
+                          ? "text-text-tertiary-dark"
+                          : "text-text-tertiary"
                       }`}
                     >
                       CH {net.channel}
                     </Text>
                     <Text
                       className={`text-[10px] ${
-                        isDark ? "text-text-tertiary-dark" : "text-text-tertiary"
+                        isDark
+                          ? "text-text-tertiary-dark"
+                          : "text-text-tertiary"
                       }`}
                     >
                       {net.band}
@@ -193,7 +200,9 @@ const WifiNetworkList = ({
                       )}
                       <Text
                         className={`text-[10px] ${
-                          isDark ? "text-text-tertiary-dark" : "text-text-tertiary"
+                          isDark
+                            ? "text-text-tertiary-dark"
+                            : "text-text-tertiary"
                         }`}
                       >
                         {net.security}
@@ -205,7 +214,15 @@ const WifiNetworkList = ({
                 {/* Signal */}
                 <View className="items-end">
                   <WifiSignalIndicator
-                    strength={net.rssi >= -50 ? 100 : net.rssi >= -70 ? 60 : net.rssi >= -85 ? 30 : 10}
+                    strength={
+                      net.rssi >= -50
+                        ? 100
+                        : net.rssi >= -70
+                          ? 60
+                          : net.rssi >= -85
+                            ? 30
+                            : 10
+                    }
                     color={color}
                     size="sm"
                   />

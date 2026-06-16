@@ -22,28 +22,37 @@ interface AnimatedSplashScreenProps {
   tagline: string;
 }
 
-const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScreenProps) => {
+const AnimatedSplashScreen = ({
+  onFinish,
+  isDark,
+  tagline,
+}: AnimatedSplashScreenProps) => {
   // ── Central orb ──
   const orbScale = useRef(new Animated.Value(0.3)).current;
   const orbOpacity = useRef(new Animated.Value(0)).current;
+
   const orbGlow1 = useRef(new Animated.Value(0)).current;
   const orbGlow2 = useRef(new Animated.Value(0)).current;
 
   // ── Sonar ripples ──
   const r1Scale = useRef(new Animated.Value(0.6)).current;
   const r1Op = useRef(new Animated.Value(0)).current;
+
   const r2Scale = useRef(new Animated.Value(0.6)).current;
   const r2Op = useRef(new Animated.Value(0)).current;
+
   const r3Scale = useRef(new Animated.Value(0.6)).current;
   const r3Op = useRef(new Animated.Value(0)).current;
 
   // ── Floating motes ──
-  const motes = Array.from({ length: 8 }, () => ({
-    opacity: useRef(new Animated.Value(0)).current,
-    y: useRef(new Animated.Value(0)).current,
-    x: useRef(new Animated.Value(0)).current,
-    scale: useRef(new Animated.Value(0)).current,
-  }));
+  const motes = useRef(
+    Array.from({ length: 8 }, () => ({
+      opacity: new Animated.Value(0),
+      y: new Animated.Value(0),
+      x: new Animated.Value(0),
+      scale: new Animated.Value(0),
+    })),
+  ).current;
 
   // ── Icon ──
   const iconOpacity = useRef(new Animated.Value(0)).current;
@@ -66,14 +75,78 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
   const exitScale = useRef(new Animated.Value(1)).current;
 
   const moteConfigs = [
-    { startX: -45, startY: 30, driftX: -12, driftY: -120, size: 5, delay: 0, color: "#60A5FA" },
-    { startX: 55, startY: -20, driftX: 8, driftY: -130, size: 4, delay: 30, color: "#38BDF8" },
-    { startX: -25, startY: -50, driftX: -18, driftY: -100, size: 6, delay: 60, color: "#93C5FD" },
-    { startX: 70, startY: 45, driftX: 15, driftY: -140, size: 3.5, delay: 20, color: "#22D3EE" },
-    { startX: -65, startY: -10, driftX: -20, driftY: -110, size: 4.5, delay: 70, color: "#7DD3FC" },
-    { startX: 35, startY: 60, driftX: 5, driftY: -125, size: 5.5, delay: 40, color: "#BAE6FD" },
-    { startX: -10, startY: -65, driftX: -8, driftY: -95, size: 3, delay: 90, color: "#67E8F9" },
-    { startX: 50, startY: 15, driftX: 22, driftY: -135, size: 4, delay: 55, color: "#A5F3FC" },
+    {
+      startX: -45,
+      startY: 30,
+      driftX: -12,
+      driftY: -120,
+      size: 5,
+      delay: 0,
+      color: "#60A5FA",
+    },
+    {
+      startX: 55,
+      startY: -20,
+      driftX: 8,
+      driftY: -130,
+      size: 4,
+      delay: 30,
+      color: "#38BDF8",
+    },
+    {
+      startX: -25,
+      startY: -50,
+      driftX: -18,
+      driftY: -100,
+      size: 6,
+      delay: 60,
+      color: "#93C5FD",
+    },
+    {
+      startX: 70,
+      startY: 45,
+      driftX: 15,
+      driftY: -140,
+      size: 3.5,
+      delay: 20,
+      color: "#22D3EE",
+    },
+    {
+      startX: -65,
+      startY: -10,
+      driftX: -20,
+      driftY: -110,
+      size: 4.5,
+      delay: 70,
+      color: "#7DD3FC",
+    },
+    {
+      startX: 35,
+      startY: 60,
+      driftX: 5,
+      driftY: -125,
+      size: 5.5,
+      delay: 40,
+      color: "#BAE6FD",
+    },
+    {
+      startX: -10,
+      startY: -65,
+      driftX: -8,
+      driftY: -95,
+      size: 3,
+      delay: 90,
+      color: "#67E8F9",
+    },
+    {
+      startX: 50,
+      startY: 15,
+      driftX: 22,
+      driftY: -135,
+      size: 4,
+      delay: 55,
+      color: "#A5F3FC",
+    },
   ];
 
   useEffect(() => {
@@ -293,9 +366,21 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
         <View className="flex-1 items-center justify-center">
           {/* ── Sonar ripples ── */}
           {[
-            { scale: r1Scale, opacity: r1Op, color: isDark ? "rgba(96,165,250,0.30)" : "rgba(59,130,246,0.25)" },
-            { scale: r2Scale, opacity: r2Op, color: isDark ? "rgba(56,189,248,0.25)" : "rgba(14,165,233,0.22)" },
-            { scale: r3Scale, opacity: r3Op, color: isDark ? "rgba(34,211,238,0.20)" : "rgba(59,130,246,0.18)" },
+            {
+              scale: r1Scale,
+              opacity: r1Op,
+              color: isDark ? "rgba(96,165,250,0.30)" : "rgba(59,130,246,0.25)",
+            },
+            {
+              scale: r2Scale,
+              opacity: r2Op,
+              color: isDark ? "rgba(56,189,248,0.25)" : "rgba(14,165,233,0.22)",
+            },
+            {
+              scale: r3Scale,
+              opacity: r3Op,
+              color: isDark ? "rgba(34,211,238,0.20)" : "rgba(59,130,246,0.18)",
+            },
           ].map((ring, i) => (
             <Animated.View
               key={`ring-${i}`}
@@ -317,7 +402,9 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
             style={{
               width: 200,
               height: 200,
-              backgroundColor: isDark ? "rgba(96,165,250,0.08)" : "rgba(59,130,246,0.10)",
+              backgroundColor: isDark
+                ? "rgba(96,165,250,0.08)"
+                : "rgba(59,130,246,0.10)",
               opacity: orbGlow2,
               transform: [{ scale: orbScale }],
             }}
@@ -329,7 +416,9 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
             style={{
               width: 150,
               height: 150,
-              backgroundColor: isDark ? "rgba(96,165,250,0.15)" : "rgba(59,130,246,0.14)",
+              backgroundColor: isDark
+                ? "rgba(96,165,250,0.15)"
+                : "rgba(59,130,246,0.14)",
               opacity: orbGlow1,
               transform: [{ scale: orbScale }],
             }}
@@ -341,7 +430,9 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
             style={{
               width: 110,
               height: 110,
-              backgroundColor: isDark ? "rgba(96,165,250,0.22)" : "rgba(59,130,246,0.18)",
+              backgroundColor: isDark
+                ? "rgba(96,165,250,0.22)"
+                : "rgba(59,130,246,0.18)",
               opacity: orbOpacity,
               transform: [{ scale: orbScale }],
             }}
@@ -376,7 +467,7 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
             );
           })}
 
-          {/* ── App icon ── */}
+          {/* ── App icon (logo only — sits on top of the glowing orb) ── */}
           <Animated.View
             className="items-center justify-center"
             style={{
@@ -384,23 +475,11 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
               transform: [{ scale: iconScale }],
             }}
           >
-            <View
-              className="w-24 h-24 rounded-3xl items-center justify-center"
-              style={{
-                backgroundColor: "rgba(255,255,255,0.95)",
-                shadowColor: "#3B82F6",
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.5,
-                shadowRadius: 30,
-                elevation: 20,
-              }}
-            >
-              <Image
-                source={require("@/assets/images/icon.png")}
-                className="w-16 h-16"
-                resizeMode="contain"
-              />
-            </View>
+            <Image
+              source={require("@/assets/images/icon.png")}
+              style={{ width: 120, height: 120 }}
+              resizeMode="contain"
+            />
           </Animated.View>
         </View>
 
@@ -416,7 +495,9 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
               className="text-lg tracking-widest"
               style={{
                 fontWeight: "300",
-                color: isDark ? "rgba(255,255,255,0.9)" : "rgba(30,58,138,0.85)",
+                color: isDark
+                  ? "rgba(255,255,255,0.9)"
+                  : "rgba(30,58,138,0.85)",
               }}
             >
               Signal Sense
@@ -428,7 +509,9 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
             style={{
               height: 0.5,
               width: 40,
-              backgroundColor: isDark ? "rgba(148,163,184,0.4)" : "rgba(30,58,138,0.2)",
+              backgroundColor: isDark
+                ? "rgba(148,163,184,0.4)"
+                : "rgba(30,58,138,0.2)",
               opacity: lineOpacity,
               transform: [{ scaleX: lineWidth }],
             }}
@@ -444,7 +527,9 @@ const AnimatedSplashScreen = ({ onFinish, isDark, tagline }: AnimatedSplashScree
               className="text-xs tracking-wider"
               style={{
                 fontWeight: "300",
-                color: isDark ? "rgba(255,255,255,0.4)" : "rgba(30,58,138,0.45)",
+                color: isDark
+                  ? "rgba(255,255,255,0.4)"
+                  : "rgba(30,58,138,0.45)",
               }}
             >
               {tagline}

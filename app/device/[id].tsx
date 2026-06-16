@@ -1,8 +1,7 @@
-import { FlashList } from "@shopify/flash-list";
-
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { memo, useCallback, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
+import { FlashList } from "@shopify/flash-list";
 import {
   Activity,
   Bluetooth,
@@ -29,8 +28,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import * as Haptics from "expo-haptics";
-
 import { PremiumBadge, PremiumGate } from "@/components/premium";
+
 import { useAntiStalking } from "@/hooks";
 import { useDeviceProfile } from "@/hooks/useDeviceProfile";
 
@@ -86,10 +85,14 @@ const DeviceProfileScreen = () => {
   const handleToggleTrust = useCallback(async () => {
     if (!rawDeviceId) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     if (isTrusted) {
       await untrustDevice(rawDeviceId);
     } else {
-      await trustDevice(rawDeviceId, device?.customName ?? device?.deviceName ?? null);
+      await trustDevice(
+        rawDeviceId,
+        device?.customName ?? device?.deviceName ?? null,
+      );
     }
   }, [
     rawDeviceId,
@@ -110,16 +113,22 @@ const DeviceProfileScreen = () => {
 
   // Edit name modal state
   const NAME_MAX_LENGTH = 30;
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [editNameValue, setEditNameValue] = useState("");
+
+  const [isEditModalVisible, setIsEditModalVisible] = useState<boolean>(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] =
+    useState<boolean>(false);
+
+  const [editNameValue, setEditNameValue] = useState<string>("");
 
   const trimmedName = editNameValue.trim();
   const hasMultipleSpaces = /\s{2,}/.test(editNameValue);
+
   const hasLeadingSpace =
     editNameValue.length > 0 && editNameValue[0] === " " && !hasMultipleSpaces;
+
   const isOverLimit = trimmedName.length > NAME_MAX_LENGTH;
   const hasSpaceError = hasMultipleSpaces || hasLeadingSpace;
+
   const isSaveDisabled =
     trimmedName.length === 0 || isOverLimit || hasSpaceError;
 
@@ -140,6 +149,7 @@ const DeviceProfileScreen = () => {
     const trimmed = editNameValue.trim();
     if (!trimmed || trimmed.length > NAME_MAX_LENGTH || /\s{2,}/.test(trimmed))
       return;
+
     await setCustomName(trimmed);
     setIsEditModalVisible(false);
   }, [editNameValue, setCustomName]);

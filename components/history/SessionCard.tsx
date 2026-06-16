@@ -1,8 +1,14 @@
 import { memo } from "react";
+import {
+  Bluetooth,
+  Clock,
+  Compass,
+  Radio,
+  Trash2,
+  Wifi,
+} from "lucide-react-native";
 
-import { Bluetooth, Clock, Compass, Radio, Trash2, Wifi } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
-
 import type {
   SessionType,
   UnifiedSession,
@@ -155,11 +161,7 @@ const SessionCard = memo(function SessionCard({
             <View className="flex-row items-center mt-1 gap-3">
               {session.type === "wifi" && session.ssid && (
                 <View className="flex-row items-center gap-1">
-                  <Wifi
-                    size={11}
-                    color={theme.textSecondary}
-                    strokeWidth={2}
-                  />
+                  <Wifi size={11} color={theme.textSecondary} strokeWidth={2} />
                   <Text
                     className={`text-xs ${isDark ? "text-text-tertiary-dark" : "text-text-tertiary"}`}
                     numberOfLines={1}

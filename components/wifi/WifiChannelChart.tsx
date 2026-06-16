@@ -40,7 +40,9 @@ const WifiChannelChart = ({
   if (channels.length === 0) return null;
 
   return (
-    <View className={`rounded-2xl p-4 ${isDark ? "bg-surface-dark" : "bg-surface"}`}>
+    <View
+      className={`rounded-2xl p-4 ${isDark ? "bg-surface-dark" : "bg-surface"}`}
+    >
       {/* Header */}
       <Text
         className={`text-xs font-bold uppercase mb-4 ${
@@ -51,7 +53,10 @@ const WifiChannelChart = ({
       </Text>
 
       {/* Chart */}
-      <View className="flex-row items-end justify-between" style={{ height: 100 }}>
+      <View
+        className="flex-row items-end justify-between"
+        style={{ height: 100 }}
+      >
         {channels.map((ch) => {
           const barHeight = Math.max((ch.networkCount / maxCount) * 80, 8);
           const color = getCongestionColor(ch.congestion);
@@ -59,10 +64,7 @@ const WifiChannelChart = ({
           return (
             <View key={ch.channel} className="items-center flex-1">
               {/* Count label */}
-              <Text
-                className="text-[9px] font-bold mb-1"
-                style={{ color }}
-              >
+              <Text className="text-[9px] font-bold mb-1" style={{ color }}>
                 {ch.networkCount}
               </Text>
 

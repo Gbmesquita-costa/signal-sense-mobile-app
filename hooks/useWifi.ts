@@ -37,13 +37,14 @@ function useWifi(): UseWifiReturn {
   const [channelAnalysis, setChannelAnalysis] = useState<WifiChannelInfo[]>([]);
 
   const [error, setError] = useState<string | null>(null);
-  const [isScanningNetworks, setIsScanningNetworks] = useState(false);
+  const [isScanningNetworks, setIsScanningNetworks] = useState<boolean>(false);
 
   const isPremium = useIsPremium();
   const isMonitoringRef = useRef(false);
 
   // DB persistence refs
   const sessionIdRef = useRef<string | null>(null);
+
   const sessionStartedRef = useRef(false);
   const sampleBufferRef = useRef<WifiSample[]>([]);
 

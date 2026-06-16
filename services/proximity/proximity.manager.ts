@@ -47,6 +47,7 @@ class ProximityManager {
 
     this.isMonitoring = true;
     this.rssiHistory = [];
+
     this.smoothedRssi = 0;
     this.currentLevel = "unknown";
 
@@ -73,6 +74,7 @@ class ProximityManager {
 
     this.cleanDeviceId = null;
     this.rssiHistory = [];
+
     this.smoothedRssi = 0;
     this.currentLevel = "unknown";
   }
@@ -191,8 +193,8 @@ class ProximityManager {
     if (!levelChanged && now - this.lastEmitTime < this.config.updateInterval) {
       return;
     }
-    this.lastEmitTime = now;
 
+    this.lastEmitTime = now;
     this.emitUpdate({
       level,
       rssi: rawRssi,
@@ -216,8 +218,8 @@ class ProximityManager {
 
     if (data.level !== this.currentLevel) {
       const previous = this.currentLevel;
-      this.currentLevel = data.level;
 
+      this.currentLevel = data.level;
       this.callbacks.onLevelChange?.(data.level);
 
       if (previous === "unknown" && data.level !== "unknown") {

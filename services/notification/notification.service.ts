@@ -16,6 +16,7 @@ class NotificationService {
 
     await this.setupChannels();
     this.initialized = true;
+
     return true;
   }
 
@@ -50,6 +51,7 @@ class NotificationService {
     const durationMin = Math.max(1, Math.round(alert.durationMs / 60_000));
     const deviceLabel =
       alert.deviceName ?? alert.trackerType ?? i18n.t("common.unknown");
+
     const unit =
       durationMin === 1
         ? i18n.t("antiStalking.notification.minute")

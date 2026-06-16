@@ -74,6 +74,7 @@ const RadarAnimation = ({
         ? Haptics.ImpactFeedbackStyle.Medium
         : Haptics.ImpactFeedbackStyle.Heavy,
     );
+
     onPress?.();
   };
 

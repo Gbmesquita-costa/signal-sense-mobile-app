@@ -1,5 +1,6 @@
 export { DeviceCard } from "./DeviceCard";
 export { DeviceFilters } from "./DeviceFilters";
+
 export { DeviceList } from "./DeviceList";
 
 export { RadarAnimation } from "./RadarAnimation";
