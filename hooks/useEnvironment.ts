@@ -1,13 +1,22 @@
 /**
  * Hook useEnvironment
  * Manages the magnetometer sensor lifecycle
- * OPTIMIZED with Reanimated shared values ​​for maximum fluidity
+ *
+ * The service delivers filtered samples at ~20 Hz. Shared values are only
+ * written every UI_UPDATE_INTERVAL_MS and animate linearly towards the new
+ * reading over that same interval, so the numbers and circles move smoothly
+ * instead of stepping on every sample.
  */
 
 import * as Haptics from "expo-haptics";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SharedValue, useSharedValue } from "react-native-reanimated";
+import {
+  Easing,
+  SharedValue,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import {
   environmentService,
@@ -47,6 +56,10 @@ interface UseEnvironmentReturn {
   startMonitoring: () => Promise<void>;
   stopMonitoring: () => void;
 }
+
+// 10 Hz is smooth to the eye and keeps text updates readable.
+const UI_UPDATE_INTERVAL_MS = 100;
+const UI_TIMING = { duration: UI_UPDATE_INTERVAL_MS, easing: Easing.linear };
 
 const STATUS_SEVERITY: Record<EnvironmentStatus, number> = {
   stable: 0,
@@ -92,6 +105,9 @@ function useEnvironment(): UseEnvironmentReturn {
 
   // Reference to control whether it is already monitoring (prevents setScreenState from looping)
   const isMonitoringRef = useRef(false);
+
+  // UI throttle — last time the shared values were written
+  const lastUiUpdateRef = useRef(0);
 
   // Haptic debounce — minimum 800ms between haptic events
   const lastHapticTimeRef = useRef(0);
@@ -144,19 +160,24 @@ function useEnvironment(): UseEnvironmentReturn {
 
       currentStatusRef.current = "stable";
       isMonitoringRef.current = false;
+      lastUiUpdateRef.current = 0;
       sessionStartedRef.current = false;
 
       // Reset and start the service
       environmentService.reset();
 
       environmentService.start((newState) => {
-        // Update shared values ​​directly (without re-rendering)
         if (newState.data) {
-          magnitude.value = newState.data.magnitude;
+          // Throttled shared value writes (no React re-render involved)
+          const uiNow = Date.now();
+          if (uiNow - lastUiUpdateRef.current >= UI_UPDATE_INTERVAL_MS) {
+            lastUiUpdateRef.current = uiNow;
 
-          x.value = newState.data.x;
-          y.value = newState.data.y;
-          z.value = newState.data.z;
+            magnitude.value = withTiming(newState.data.magnitude, UI_TIMING);
+            x.value = withTiming(newState.data.x, UI_TIMING);
+            y.value = withTiming(newState.data.y, UI_TIMING);
+            z.value = withTiming(newState.data.z, UI_TIMING);
+          }
 
           // Lazy session creation — only on first actual data
           if (!sessionStartedRef.current) {
