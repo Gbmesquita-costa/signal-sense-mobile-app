@@ -53,4 +53,23 @@ describe("RssiProcessor", () => {
     );
     expect(processor.getTrend({ ...base, history: [-60, -61] })).toBe("stable");
   });
+
+  it("treats a signal as stable only with enough low-variance samples", () => {
+    const base = processor.createInitial(-60);
+
+    expect(processor.isStable(base)).toBe(false);
+    expect(processor.isStable({ ...base, history: [-60, -62, -65] })).toBe(
+      true,
+    );
+    expect(processor.isStable({ ...base, history: [-50, -70, -60] })).toBe(
+      false,
+    );
+    // Only the last five samples count.
+    expect(
+      processor.isStable({
+        ...base,
+        history: [-30, -60, -61, -62, -60, -61],
+      }),
+    ).toBe(true);
+  });
 });

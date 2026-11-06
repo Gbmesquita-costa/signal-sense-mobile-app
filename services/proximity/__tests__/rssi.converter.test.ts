@@ -51,4 +51,20 @@ describe("rssi.converter", () => {
     expect(formatDistance(23.6)).toBe("24 m");
     expect(formatRssi(-67)).toBe("-67 dBm");
   });
+
+  it("calibrates TX power from the history median within -70..-50 dBm", () => {
+    const weakHistory = Array(10).fill(-95);
+    const strongHistory = Array(10).fill(-30);
+
+    // Median -95 clamps to -70, so -70 dBm reads as ~1 m.
+    expect(rssiToDistance(-70, -59, 3, "a", weakHistory)).toBeCloseTo(1, 5);
+
+    clearKalmanState("a");
+    // Median -30 clamps to -50, so -50 dBm reads as ~1 m.
+    expect(rssiToDistance(-50, -59, 3, "a", strongHistory)).toBeCloseTo(1, 5);
+
+    clearKalmanState("a");
+    // Fewer than 10 samples: the configured TX power is used as is.
+    expect(rssiToDistance(-59, -59, 3, "a", [-95, -95])).toBeCloseTo(1, 5);
+  });
 });
