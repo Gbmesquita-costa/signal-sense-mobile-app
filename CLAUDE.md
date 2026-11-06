@@ -68,7 +68,12 @@ Layers, from the outside in. Dependencies only point downwards.
 
    Pure algorithms (filters, converters, detectors) must not import React or
    native modules so they can be unit tested directly.
-6. **`lib/`** – cross-cutting helpers: `i18n/` (pt-BR, en, es) and navigation.
+6. **`domain/`** – pure, framework-free algorithms shared by services.
+   `domain/sensors/` holds the magnetometer filter pipeline (outlier gate,
+   rolling median, time-constant EMA, motion-aware magnitude smoothing) used
+   by `services/environment`. Nothing here may import React, Expo or native
+   modules.
+7. **`lib/`** – cross-cutting helpers: `i18n/` (pt-BR, en, es) and navigation.
 
 ## Conventions
 
