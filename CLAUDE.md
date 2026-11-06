@@ -80,6 +80,8 @@ Layers, from the outside in. Dependencies only point downwards.
    - `camera-detector/` Wi-Fi proximity + network heuristics for possible cameras
    - `tracker/`, `stalker/` tracker signatures, follow detection, background task
    - `environment/` magnetometer (`expo-sensors`)
+   - `signal-compass/` AR Signal Finder session: device motion + budgeted
+     Wi-Fi scans of one BSSID fed into `domain/signal-compass`
    - `database/`, `history/`, `export/`, `notification/`, `premium/`
 
    Pure algorithms (filters, converters, detectors) must not import React or
@@ -87,8 +89,10 @@ Layers, from the outside in. Dependencies only point downwards.
 6. **`domain/`** – pure, framework-free algorithms shared by services.
    `domain/sensors/` holds the magnetometer filter pipeline (outlier gate,
    rolling median, time-constant EMA, motion-aware magnitude smoothing) used
-   by `services/environment`. Nothing here may import React, Expo or native
-   modules.
+   by `services/environment`. `domain/signal-compass/` holds the AR Signal
+   Finder math: step detection, dead reckoning, camera pose, RSSI Kalman
+   filter, the particle-filter bearing estimator and screen projection.
+   Nothing here may import React, Expo or native modules.
 7. **`lib/`** – cross-cutting helpers: `i18n/` (pt-BR, en, es) and navigation.
 
 ## Conventions
