@@ -49,6 +49,13 @@
       ],
       "react-native-wifi-reborn",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "SignalSense uses the camera only to show the live preview behind the AR Signal Finder overlay. Nothing is recorded or uploaded.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
         "expo-notifications",
         {
           "icon": "./assets/images/icon.png",
