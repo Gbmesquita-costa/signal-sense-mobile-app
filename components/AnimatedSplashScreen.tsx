@@ -345,6 +345,9 @@ const AnimatedSplashScreen = ({
 
     animation.start(() => onFinish());
     return () => animation.stop();
+    // The intro sequence runs exactly once on mount; Animated.Values are
+    // stable refs and re-running on onFinish identity changes would restart it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

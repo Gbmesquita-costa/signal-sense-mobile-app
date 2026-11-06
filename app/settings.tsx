@@ -63,6 +63,7 @@ const SettingsScreen = () => {
 
   return (
     <View
+      testID="settings-screen"
       className={`flex-1 ${isDark ? "bg-background-dark" : "bg-background"}`}
     >
       {/* Header */}
@@ -80,6 +81,7 @@ const SettingsScreen = () => {
           </Text>
           <Pressable
             onPress={() => router.back()}
+            testID="settings-close"
             className="p-2 -mr-2 active:opacity-70"
             hitSlop={8}
           >

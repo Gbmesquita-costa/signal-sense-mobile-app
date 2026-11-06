@@ -183,6 +183,7 @@ const PaywallScreen = () => {
 
   return (
     <View
+      testID="paywall-screen"
       className={`flex-1 ${isDark ? "bg-background-dark" : "bg-background"}`}
     >
       {/* Header */}
@@ -198,6 +199,7 @@ const PaywallScreen = () => {
           </Text>
           <Pressable
             onPress={() => router.back()}
+            testID="paywall-close"
             className="p-2 -mr-2 active:opacity-70"
             hitSlop={8}
           >

@@ -1,0 +1,23 @@
+# Settings opens from the header and closes back to the tabs.
+appId: com.signalsense.app
+name: Open settings
+tags:
+  - smoke
+---
+- launchApp:
+    permissions:
+      all: allow
+- extendedWaitUntil:
+    visible:
+      id: "header-settings"
+    timeout: 20000
+- tapOn:
+    id: "header-settings"
+- assertVisible:
+    id: "settings-screen"
+- tapOn:
+    id: "settings-close"
+- assertVisible:
+    id: "header-settings"
+- assertNotVisible:
+    id: "settings-screen"

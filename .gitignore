@@ -38,10 +38,9 @@ app-example
 /ios
 /android
 
-# Environment variables
-.env
-.env.production
-.env.local
+# Environment variables (only the template is tracked)
+.env*
+!.env.example
 
 # EAS credentials
 google-service-account.json
@@ -53,3 +52,8 @@ google-service-account.json
 *.apk
 *.aab
 *.ipa
+
+# Test reports
+coverage/
+playwright-report/
+test-results/

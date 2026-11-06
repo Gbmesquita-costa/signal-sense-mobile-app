@@ -1,14 +1,15 @@
-name: EAS Build and Submit
+name: Deploy
 
+# Push to staging -> OTA update on the "staging" channel (preview builds).
+# Push to main    -> OTA update on the "production" channel.
+# Native builds are started by hand (workflow_dispatch), never on PRs.
 on:
   push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
+    branches: [main, staging]
   workflow_dispatch:
     inputs:
       profile:
-        description: "Build profile"
+        description: "EAS build profile"
         required: true
         default: "preview"
         type: choice
@@ -17,66 +18,140 @@ on:
           - preview
           - production
 
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  build:
-    name: EAS Build
+  checks:
+    name: Checks
+    uses: ./.github/workflows/ci.yml
+
+  update:
+    name: EAS Update
+    needs: checks
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Check Expo credentials and project link
+        id: guard
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::notice title=EAS Update skipped::EXPO_TOKEN secret is not set."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          project_id=$(node -p "require('./app.json').expo.extra?.eas?.projectId ?? ''")
+          if [ -z "$project_id" ]; then
+            echo "::notice title=EAS Update skipped::app.json has no extra.eas.projectId. Run 'eas init' and 'eas update:configure' first."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Pick channel
+        if: steps.guard.outputs.ready == 'true'
+        id: target
+        run: |
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
+            echo "channel=production" >> "$GITHUB_OUTPUT"
+            echo "environment=production" >> "$GITHUB_OUTPUT"
+          else
+            echo "channel=staging" >> "$GITHUB_OUTPUT"
+            echo "environment=preview" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        if: steps.guard.outputs.ready == 'true'
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
-          cache: "npm"
+          node-version: 22
+          cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
+      - name: Setup EAS
+        if: steps.guard.outputs.ready == 'true'
+        uses: expo/expo-github-action@v9
         with:
           eas-version: latest
+          packager: npm
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
+        if: steps.guard.outputs.ready == 'true'
         run: npm ci
 
-      - name: Build on EAS (Auto Push)
-        if: github.event_name == 'push'
-        run: |
-          eas build --platform android --profile preview --non-interactive --no-wait
+      - name: Publish update
+        if: steps.guard.outputs.ready == 'true'
+        run: >
+          eas update
+          --channel ${{ steps.target.outputs.channel }}
+          --environment ${{ steps.target.outputs.environment }}
+          --platform android
+          --message "${{ github.ref_name }}@${{ github.sha }}"
+          --non-interactive
 
-      - name: Build on EAS (Manual - Production)
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'production'
-        run: |
-          eas build --platform android --profile production --non-interactive
-
-      - name: Build on EAS (Manual - Other)
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.profile != 'production'
-        run: |
-          eas build --platform android --profile ${{ github.event.inputs.profile }} --non-interactive --no-wait
-
-  submit:
-    name: Submit to Google Play
+  build:
+    name: EAS Build
+    needs: checks
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'production'
+    timeout-minutes: 30
 
     steps:
+      - name: Check Expo credentials
+        id: guard
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::notice title=EAS Build skipped::EXPO_TOKEN secret is not set."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
-        uses: actions/checkout@v4
+        if: steps.guard.outputs.ready == 'true'
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        if: steps.guard.outputs.ready == 'true'
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
 
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
+      - name: Setup EAS
+        if: steps.guard.outputs.ready == 'true'
+        uses: expo/expo-github-action@v9
         with:
           eas-version: latest
+          packager: npm
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Submit to Google Play (Internal Testing)
-        run: eas submit --platform android --latest --non-interactive
+      - name: Install dependencies
+        if: steps.guard.outputs.ready == 'true'
+        run: npm ci
+
+      - name: Build on EAS
+        if: steps.guard.outputs.ready == 'true'
+        env:
+          PROFILE: ${{ github.event.inputs.profile }}
+        # Production builds are submitted to the Play internal track by EAS
+        # (submit.production in eas.json) once the build finishes.
+        run: |
+          submit=""
+          if [ "$PROFILE" = "production" ]; then submit="--auto-submit"; fi
+          eas build --platform android --profile "$PROFILE" --non-interactive --no-wait $submit

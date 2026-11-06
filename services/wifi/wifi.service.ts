@@ -1,5 +1,6 @@
 import NetInfo, { type NetInfoState } from "@react-native-community/netinfo";
 import { Platform } from "react-native";
+import type { WifiEntry } from "react-native-wifi-reborn";
 
 import type {
   FrequencyBand,
@@ -9,6 +10,28 @@ import type {
   WifiConnectionInfo,
   WifiNetwork,
 } from "./wifi.types";
+
+/**
+ * Parse security from an Android ScanResult capabilities string, e.g.
+ * "[WPA2-PSK-CCMP][RSN-PSK-CCMP][ESS]" or "[RSN-SAE-CCMP][ESS]".
+ * Android names WPA3 by its key management (SAE, SUITE_B_192) and
+ * WPA2 as RSN, so neither of those can be told apart by "WPA" alone.
+ */
+function parseSecurity(capabilities: string): SecurityType {
+  const caps = capabilities.toUpperCase();
+
+  if (/WPA3|SAE|SUITE[_-]B/.test(caps)) return "WPA3";
+  // OWE ("Enhanced Open") encrypts traffic but anyone can join without a
+  // password, which is what "Open" means to the user.
+  if (caps.includes("OWE")) return "Open";
+  if (caps.includes("WPA2") || caps.includes("RSN")) return "WPA2";
+
+  if (caps.includes("WPA")) return "WPA";
+  if (caps.includes("WEP")) return "WEP";
+
+  if (caps.includes("ESS")) return "Open";
+  return "Unknown";
+}
 
 class WifiService {
   private monitoringInterval: ReturnType<typeof setInterval> | null = null;
@@ -80,23 +103,52 @@ class WifiService {
       const WifiManager = await import("react-native-wifi-reborn");
       const networks = await WifiManager.default.loadWifiList();
 
-      const currentState = await NetInfo.fetch("wifi");
-      const currentSSID =
-        currentState.type === "wifi" ? currentState.details?.ssid : null;
-
-      return networks.map((net) => ({
-        ssid: net.SSID,
-        bssid: net.BSSID,
-        rssi: net.level,
-        frequency: net.frequency,
-        band: this.getFrequencyBand(net.frequency),
-        channel: this.getChannel(net.frequency),
-        security: this.parseSecurity(net.capabilities),
-        isConnected: net.SSID === currentSSID && currentSSID !== null,
-      }));
+      return await this.toNetworks(networks);
     } catch {
       return [];
     }
+  }
+
+  /**
+   * Asks Android for a fresh scan (WifiManager.startScan) and waits for its
+   * results. Returns null when the request is rejected, which on Android 9+
+   * happens after 4 requests in 2 minutes in the foreground: the library
+   * then resolves a message string instead of a list. Callers must budget
+   * their requests and fall back to scanNearbyNetworks() in between.
+   */
+  async requestFreshScan(): Promise<WifiNetwork[] | null> {
+    if (Platform.OS !== "android") {
+      return null;
+    }
+
+    try {
+      const WifiManager = await import("react-native-wifi-reborn");
+      const result: unknown =
+        await WifiManager.default.reScanAndLoadWifiList();
+
+      if (!Array.isArray(result)) return null;
+      return await this.toNetworks(result as WifiEntry[]);
+    } catch {
+      return null;
+    }
+  }
+
+  private async toNetworks(entries: WifiEntry[]): Promise<WifiNetwork[]> {
+    const currentState = await NetInfo.fetch("wifi");
+    const currentSSID =
+      currentState.type === "wifi" ? currentState.details?.ssid : null;
+
+    return entries.map((net) => ({
+      ssid: net.SSID,
+      bssid: net.BSSID,
+      rssi: net.level,
+      frequency: net.frequency,
+      band: this.getFrequencyBand(net.frequency),
+      channel: this.getChannel(net.frequency),
+      security: parseSecurity(net.capabilities),
+      isConnected: net.SSID === currentSSID && currentSSID !== null,
+      timestamp: net.timestamp,
+    }));
   }
 
   /** Analyze channel congestion from network list */
@@ -197,19 +249,6 @@ class WifiService {
     }
   }
 
-  /** Parse security string from capabilities */
-  private parseSecurity(capabilities: string): SecurityType {
-    if (capabilities.includes("WPA3")) return "WPA3";
-    if (capabilities.includes("WPA2")) return "WPA2";
-
-    if (capabilities.includes("WPA")) return "WPA";
-    if (capabilities.includes("WEP")) return "WEP";
-
-    if (capabilities.includes("ESS") && !capabilities.includes("WPA"))
-      return "Open";
-    return "Unknown";
-  }
-
   /** Parse NetInfoState to WifiConnectionInfo */
   private parseNetInfoState(state: NetInfoState): WifiConnectionInfo {
     const isWifi = state.type === "wifi";
@@ -247,3 +286,4 @@ class WifiService {
 }
 
 export const wifiService = new WifiService();
+export { parseSecurity };

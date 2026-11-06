@@ -2,12 +2,17 @@
  * Environment Service
  * Manages magnetometer readings and magnetic field interpretation
  *
- * No software smoothing — the raw magnitude is passed directly.
- * Visual smoothing is handled by Reanimated's withSpring on the UI thread.
- * The hysteresis in interpretMagnitude prevents status flickering.
+ * Raw samples go through MagneticFieldFilter (outlier rejection, median,
+ * motion-aware EMA) before they reach callers, so spikes and the magnitude
+ * swings caused by moving the phone do not show up as jumps on screen.
+ * Rejected samples produce no callback. The hysteresis in
+ * interpretMagnitude, applied to the filtered magnitude, prevents status
+ * flickering at threshold boundaries.
  */
 
-import { Magnetometer } from "expo-sensors";
+import { Magnetometer, type MagnetometerMeasurement } from "expo-sensors";
+
+import { MagneticFieldFilter } from "@/domain/sensors";
 
 type EnvironmentStatus = "stable" | "moderate" | "high" | "extreme";
 interface MagnetometerData {
@@ -23,11 +28,18 @@ interface EnvironmentState {
   isAvailable: boolean;
 }
 
-const UPDATE_INTERVAL = 33; // ~30 FPS
+// 20 Hz: enough for the filter (median window of 5 = 250 ms) and half the
+// JS work of the previous 30 Hz raw stream.
+const UPDATE_INTERVAL = 50;
+
+type EnvironmentCallback = (state: EnvironmentState) => void;
 
 class EnvironmentService {
-  private subscription: any = null;
+  private subscription: ReturnType<typeof Magnetometer.addListener> | null =
+    null;
+  private callback: EnvironmentCallback | null = null;
   private currentStatus: EnvironmentStatus = "stable";
+  private readonly filter = new MagneticFieldFilter();
 
   /**
    * Check if the magnetometer is available in the hardware
@@ -41,29 +53,47 @@ class EnvironmentService {
   }
 
   /**
-   * Starts magnetic field monitoring
-   * Raw values — Reanimated handles visual smoothing via withSpring
+   * Starts magnetic field monitoring with filtered readings.
+   * Calling it again while running only replaces the callback, so there is
+   * never more than one native subscription.
    */
-  start(callback: (state: EnvironmentState) => void): void {
+  start(callback: EnvironmentCallback): void {
+    this.callback = callback;
     if (this.subscription) return;
 
     this.currentStatus = "stable";
+    this.filter.reset();
     Magnetometer.setUpdateInterval(UPDATE_INTERVAL);
 
-    this.subscription = Magnetometer.addListener((data) => {
-      const magnitude = this.calculateMagnitude(data.x, data.y, data.z);
-      const status = this.interpretMagnitude(magnitude);
+    this.subscription = Magnetometer.addListener((data) =>
+      this.handleSample(data),
+    );
+  }
 
-      callback({
-        data: {
-          x: data.x,
-          y: data.y,
-          z: data.z,
-          magnitude,
-        },
-        status,
-        isAvailable: true,
-      });
+  private handleSample(data: MagnetometerMeasurement): void {
+    const filtered = this.filter.push({
+      x: data.x,
+      y: data.y,
+      z: data.z,
+      // expo-sensors reports seconds; fall back to wall clock if missing.
+      timestampMs: Number.isFinite(data.timestamp)
+        ? data.timestamp * 1000
+        : Date.now(),
+    });
+
+    if (!filtered || filtered.rejected) return;
+
+    const status = this.interpretMagnitude(filtered.magnitude);
+
+    this.callback?.({
+      data: {
+        x: filtered.x,
+        y: filtered.y,
+        z: filtered.z,
+        magnitude: filtered.magnitude,
+      },
+      status,
+      isAvailable: true,
     });
   }
 
@@ -75,6 +105,7 @@ class EnvironmentService {
       this.subscription.remove();
       this.subscription = null;
     }
+    this.callback = null;
   }
 
   /**
@@ -82,6 +113,7 @@ class EnvironmentService {
    */
   reset(): void {
     this.currentStatus = "stable";
+    this.filter.reset();
   }
 
   /**

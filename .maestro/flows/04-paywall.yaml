@@ -1,0 +1,24 @@
+# The paywall opens from a deep link and closes back to the tabs.
+# A deep link is used because dev builds force premium on, which hides
+# the "Unlock Premium" row in Settings.
+appId: com.signalsense.app
+name: Open paywall
+tags:
+  - smoke
+---
+- launchApp:
+    permissions:
+      all: allow
+- extendedWaitUntil:
+    visible:
+      id: "header-settings"
+    timeout: 20000
+- openLink: "signalsense://paywall"
+- extendedWaitUntil:
+    visible:
+      id: "paywall-screen"
+    timeout: 10000
+- tapOn:
+    id: "paywall-close"
+- assertVisible:
+    id: "header-settings"

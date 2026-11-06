@@ -29,11 +29,13 @@
 - [🧩 Módulos e Lógica de Cada Feature](#-módulos-e-lógica-de-cada-feature)
 - [📈 O Motor de Proximidade (RSSI → distância)](#-o-motor-de-proximidade-rssi--distância)
 - [🕵️ Detector de Câmeras](#-detector-de-câmeras)
+- [🧭 AR Signal Finder (experimental)](#-ar-signal-finder-experimental)
 - [💎 Modelo Premium](#-modelo-premium)
 - [🌍 Internacionalização](#-internacionalização)
 - [🎨 Tema e UX](#-tema-e-ux)
 - [🔐 Privacidade](#-privacidade)
 - [📚 Scripts Disponíveis](#-scripts-disponíveis)
+- [✅ Testes, CI/CD e fluxo de branches](#-testes-cicd-e-fluxo-de-branches)
 - [🐛 Troubleshooting](#-troubleshooting)
 - [📄 Licença](#-licença)
 
@@ -83,7 +85,8 @@ O produto nasceu de uma dor real: a insegurança de quem suspeita estar sendo fi
 - **[react-native-ble-plx](https://github.com/dotintent/react-native-ble-plx)** — scan Bluetooth Low Energy
 - **[react-native-wifi-reborn](https://github.com/JuanSeBestia/react-native-wifi-reborn)** — redes Wi-Fi próximas
 - **[@react-native-community/netinfo](https://github.com/react-native-netinfo/react-native-netinfo)** — conexão Wi-Fi atual
-- **[expo-sensors](https://docs.expo.dev/versions/latest/sdk/sensors/)** — magnetômetro
+- **[expo-sensors](https://docs.expo.dev/versions/latest/sdk/sensors/)** — magnetômetro e DeviceMotion (orientação + passos no AR Signal Finder)
+- **[expo-camera](https://docs.expo.dev/versions/latest/sdk/camera/)** — prévia ao vivo do AR Signal Finder (nada é gravado)
 - **[react-native-tcp-socket](https://github.com/Rapsssito/react-native-tcp-socket)** — scan de portas da rede (Detector de Câmeras, Tipo B)
 - **[expo-location](https://docs.expo.dev/versions/latest/sdk/location/)** — exigência do Android para scan de BLE/Wi-Fi
 
@@ -191,6 +194,7 @@ O app separa **rotas** (UI/telas) de **serviços** (lógica de domínio), com ho
 │   │   ├── education.tsx            # Centro de conhecimento
 │   │   └── _layout.tsx              # Barra de abas + header
 │   ├── camera-detector.tsx          # ⭐ Detector de Câmeras (tela dedicada)
+│   ├── ar-finder.tsx                # ⭐ AR Signal Finder (experimental)
 │   ├── device/[id].tsx              # Detalhe/perfil de dispositivo
 │   ├── history.tsx · settings.tsx · paywall.tsx
 │   ├── index.tsx                    # Redireciona para /scan
@@ -202,6 +206,7 @@ O app separa **rotas** (UI/telas) de **serviços** (lógica de domínio), com ho
 │   ├── environment/                 # leitura do magnetômetro
 │   ├── wifi/                        # wifi.service (NetInfo + reborn)
 │   ├── camera-detector/             # ⭐ detector + wifi-proximity + network-scanner
+│   ├── signal-compass/              # sessão do AR Signal Finder (sensores + scans)
 │   ├── tracker/                     # detecção AirTag/Tile/SmartTag (OUI/UUID)
 │   ├── stalker/                     # anti-rastreamento em background
 │   ├── history/                     # sessões em SQLite
@@ -209,6 +214,7 @@ O app separa **rotas** (UI/telas) de **serviços** (lógica de domínio), com ho
 │   ├── premium/                     # RevenueCat + feature flags
 │   └── export/                      # exportação CSV
 │
+├── 📂 domain/                       # algoritmos puros: sensors/ (magnetômetro) e signal-compass/ (AR)
 ├── 📂 hooks/                        # useScan, useProximity, useWifi, …
 ├── 📂 stores/                       # useScanStore · usePremiumStore · useAntiStalkingStore
 ├── 📂 components/                   # UI por feature (+ AnimatedSplashScreen, Card…)
@@ -244,6 +250,10 @@ Monitora dispositivos BLE em **segundo plano** (`expo-task-manager`). Se um disp
 ### 🕵️ Detector de Câmeras ⭐
 
 Pilar Premium para achar câmeras Wi-Fi escondidas — veja a [seção dedicada](#-detector-de-câmeras).
+
+### 🧭 AR Signal Finder ⭐ (experimental)
+
+Aponte a câmera e siga as ondas até uma rede Wi-Fi escolhida — veja a [seção dedicada](#-ar-signal-finder-experimental).
 
 ### 🎓 Educação
 
@@ -285,12 +295,36 @@ Câmeras conectadas ao Wi-Fi do local não emitem beacon próprio. O **`networkS
 
 ---
 
+## 🧭 AR Signal Finder (experimental)
+
+> **MVP experimental.** Os algoritmos têm testes unitários com caminhadas simuladas, mas o recurso **ainda não foi validado em campo** num celular real. Trate a direção como uma pista.
+
+Na aba Wi-Fi, o card **AR Signal Finder** (ou o ícone de radar em cada rede da lista) abre a tela `app/ar-finder.tsx`: a câmera traseira mostra a imagem ao vivo e uma sobreposição desenha **ondas que fluem na direção estimada** do ponto de acesso escolhido, com seta na borda quando ele está fora do campo de visão, cor pela força do sinal, distância e confiança estimadas e vibração leve quando o sinal fica mais forte.
+
+**Como a direção é estimada (tudo no aparelho, sem rede e sem servidor):**
+
+1. **Pose da câmera** — `DeviceMotion` (rotation vector do Android: giroscópio + acelerômetro + magnetômetro) vira rumo e inclinação do eixo da câmera (`domain/signal-compass/orientation.ts`).
+2. **Passos** — detector de passos sobre a aceleração linear + _dead reckoning_ com passada fixa de 0,7 m.
+3. **Filtro de partículas** — cada partícula é uma hipótese (posição da fonte, potência a 1 m). Cada leitura de RSSI é pontuada pelo modelo log-distance `rssi = tx − 10·n·log10(d)` a partir da posição em que você estava. De um ponto só, qualquer direção explica a leitura; por isso a **confiança fica em 0 até você andar** e a tela pede alguns passos para calibrar.
+4. **Entre scans** a seta continua acompanhando seus passos e giros, porque o rumo é recalculado da sua posição atual.
+5. **Projeção** — modelo _pinhole_ com campo de visão aproximado (50°×65° em retrato; o real varia por aparelho).
+
+**Limites reais, sem maquiagem:**
+
+- **Não precisa se conectar à rede**: usa os resultados de scan, que listam todos os pontos de acesso ao alcance. Precisa de permissão de localização e da Localização ligada.
+- **O Android limita scans de Wi-Fi** (4 a cada 2 minutos em primeiro plano). O app pede scans novos só dentro desse orçamento (`services/wifi/scan-budget.ts`) e, entre eles, lê o cache; resultados repetidos (mesmo `timestamp`) não são contados de novo. Na prática as leituras chegam a cada vários segundos.
+- **BLE atualizaria bem mais rápido** (vários anúncios por segundo) e o estimador não depende da fonte, mas nesta versão o AR Signal Finder só localiza **redes Wi-Fi**.
+- Paredes, pessoas e reflexões quebram o modelo de propagação; o campo de visão e a passada são aproximações. Nos testes simulados (`domain/signal-compass/__tests__`), o erro mediano de direção fica abaixo de 30° após uma caminhada em L de ~14 m, inclusive com ambiente mais atenuante do que o modelo assume.
+- A câmera serve **só para a prévia**: nada é gravado nem enviado, e o plugin do `expo-camera` não pede permissão de microfone.
+
+---
+
 ## 💎 Modelo Premium
 
 - **Compra única** (sem assinatura), com **preço regional** via Google Play, gerenciada pelo **RevenueCat** (`react-native-purchases`).
 - O gating é feito pelo componente **`PremiumGate`** + a store `usePremiumStore`, com chaves de feature tipadas em `services/premium/premium.types.ts`.
 - **Grátis:** Scan BLE, Proximidade, Ambiente e Wi-Fi (conexão atual), Educação, tema e idiomas.
-- **Premium:** histórico ilimitado, perfis de dispositivo, **detecção de rastreadores**, gráfico RSSI ao vivo, Anti-Rastreamento avançado, análise de redes/canais Wi-Fi, **Detector de Câmeras** e exportação CSV.
+- **Premium:** histórico ilimitado, perfis de dispositivo, **detecção de rastreadores**, gráfico RSSI ao vivo, Anti-Rastreamento avançado, análise de redes/canais Wi-Fi, **Detector de Câmeras**, **AR Signal Finder** (experimental) e exportação CSV.
 
 ---
 
@@ -329,7 +363,21 @@ npm run pre:build      # expo prebuild (gera android/ ios/)
 npm run devices        # adb devices (lista aparelhos conectados)
 npm run generate:icons # gera os ícones Android
 npm run lint           # expo lint
+npm run typecheck      # tsc --noEmit
+npm test               # Jest (jest-expo)
+npm run test:coverage  # cobertura em coverage/ (ignorado pelo git)
+npm run e2e            # fluxos Maestro (precisa de emulador/aparelho)
 ```
+
+---
+
+## ✅ Testes, CI/CD e fluxo de branches
+
+- **Testes unitários (Jest + jest-expo):** algoritmos puros em `domain/` (filtros do magnetômetro, estimador do AR Signal Finder com caminhadas simuladas, projeção, passos), serviços (RSSI, rastreadores, anti-stalking, detector de câmeras, Wi-Fi, premium, sessão do AR) e hooks. Módulos nativos são mockados em `jest.setup.ts`.
+- **E2E (Maestro):** fluxos em `.maestro/flows` para abrir o app, abas, ajustes e paywall. Rodam localmente com emulador/aparelho (`npm run e2e`) e **não** rodam no CI. Veja `.maestro/README.md`.
+- **CI (`.github/workflows/ci.yml`):** lint, typecheck e Jest em todo push e pull request para `main` e `staging`.
+- **Deploy (`.github/workflows/deploy.yml`):** depois do CI, um push em `staging` publica um EAS Update no canal `staging` e um push em `main` no canal `production`. Builds nativos só rodam manualmente (workflow_dispatch). Precisa do secret `EXPO_TOKEN` e do project id do EAS; sem eles os jobs são pulados com aviso. As atualizações OTA ainda dependem de instalar `expo-updates` e configurar `updates.url` (`eas update:configure`), o que **ainda não foi feito**.
+- **Fluxo de branches:** o trabalho acontece em `staging` (cada commit passa por lint, typecheck e testes); a `main` só recebe merges revisados de `staging`, sem force-push.
 
 ---
 

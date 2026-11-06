@@ -1,7 +1,10 @@
 /**
  * MagneticVisualizer
  * Animated visual representation of the magnetic field
- * OPTIMIZED with Reanimated shared values ​​for maximum fluidity
+ *
+ * `magnitude` is already filtered and animated by useEnvironment, so the
+ * styles follow it directly. Wrapping them in withSpring restarted a spring
+ * on every frame, which added lag and overshoot on top of the filter.
  */
 
 import React from "react";
@@ -12,7 +15,6 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
   useDerivedValue,
-  withSpring,
 } from "react-native-reanimated";
 
 import { AnimatedValue } from "./AnimatedValue";
@@ -39,10 +41,8 @@ const MagneticVisualizer = ({
     const opacity = 0.3 + intensity.value * 0.3;
 
     return {
-      transform: [
-        { scale: withSpring(scale, { damping: 15, stiffness: 100 }) },
-      ],
-      opacity: withSpring(opacity, { damping: 15, stiffness: 100 }),
+      transform: [{ scale }],
+      opacity,
       backgroundColor: color,
     };
   });
@@ -52,8 +52,8 @@ const MagneticVisualizer = ({
     const opacity = 0.2 + intensity.value * 0.25;
 
     return {
-      transform: [{ scale: withSpring(scale, { damping: 15, stiffness: 90 }) }],
-      opacity: withSpring(opacity, { damping: 15, stiffness: 90 }),
+      transform: [{ scale }],
+      opacity,
       backgroundColor: color,
     };
   });
@@ -63,8 +63,8 @@ const MagneticVisualizer = ({
     const opacity = 0.1 + intensity.value * 0.2;
 
     return {
-      transform: [{ scale: withSpring(scale, { damping: 15, stiffness: 80 }) }],
-      opacity: withSpring(opacity, { damping: 15, stiffness: 80 }),
+      transform: [{ scale }],
+      opacity,
       backgroundColor: color,
     };
   });

@@ -27,6 +27,12 @@ interface WifiNetwork {
   channel: number;
   security: SecurityType;
   isConnected: boolean;
+  /**
+   * When Android last saw this access point (ScanResult.timestamp,
+   * microseconds since boot). Unchanged between two calls means the system
+   * returned a cached scan, not a new reading.
+   */
+  timestamp?: number;
 }
 
 interface WifiChannelInfo {

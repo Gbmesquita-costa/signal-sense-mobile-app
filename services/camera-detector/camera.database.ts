@@ -55,13 +55,18 @@ const CAMERA_OUI_PREFIXES: Record<string, string> = {
   "A0:FF:70": "Shenzhen OEM",
 };
 
+// Whole-word match where "_" also counts as a separator: setup SSIDs are
+// often "CAM_1234" or "DVR_0042", and \b treats "_" as part of the word.
+const word = (w: string) =>
+  new RegExp(`(^|[^a-z0-9])(${w})([^a-z0-9]|$)`, "i");
+
 /** SSID substrings/patterns that often indicate a camera or its setup AP. */
 const CAMERA_SSID_PATTERNS: RegExp[] = [
   /ip-?cam/i,
-  /\bcam(era)?\b/i,
-  /\bipc\b/i,
+  word("cam(era)?"),
+  word("ipc"),
   /hikvision|dahua|ezviz|reolink|wyze|sricam|yi-?cam|foscam|tplink-?cam/i,
-  /\bnvr\b|\bdvr\b/i,
+  word("nvr|dvr"),
   /onvif/i,
   /spy|hidden/i,
   /smartcam|wificam|netcam|babymonitor|doorbell/i,

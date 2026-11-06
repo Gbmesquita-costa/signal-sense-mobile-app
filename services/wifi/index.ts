@@ -1,3 +1,4 @@
+export { ScanBudget } from "./scan-budget";
 export { wifiService } from "./wifi.service";
 export type {
   FrequencyBand,

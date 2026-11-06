@@ -1,13 +1,22 @@
 /**
  * Hook useEnvironment
  * Manages the magnetometer sensor lifecycle
- * OPTIMIZED with Reanimated shared values ​​for maximum fluidity
+ *
+ * The service delivers filtered samples at ~20 Hz. Shared values are only
+ * written every UI_UPDATE_INTERVAL_MS and animate linearly towards the new
+ * reading over that same interval, so the numbers and circles move smoothly
+ * instead of stepping on every sample.
  */
 
 import * as Haptics from "expo-haptics";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SharedValue, useSharedValue } from "react-native-reanimated";
+import {
+  Easing,
+  SharedValue,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import {
   environmentService,
@@ -47,6 +56,10 @@ interface UseEnvironmentReturn {
   startMonitoring: () => Promise<void>;
   stopMonitoring: () => void;
 }
+
+// 10 Hz is smooth to the eye and keeps text updates readable.
+const UI_UPDATE_INTERVAL_MS = 100;
+const UI_TIMING = { duration: UI_UPDATE_INTERVAL_MS, easing: Easing.linear };
 
 const STATUS_SEVERITY: Record<EnvironmentStatus, number> = {
   stable: 0,
@@ -93,6 +106,13 @@ function useEnvironment(): UseEnvironmentReturn {
   // Reference to control whether it is already monitoring (prevents setScreenState from looping)
   const isMonitoringRef = useRef(false);
 
+  // Incremented on every start and stop; async work from an older run
+  // (availability check, session creation) compares against it and bails.
+  const runIdRef = useRef(0);
+
+  // UI throttle — last time the shared values were written
+  const lastUiUpdateRef = useRef(0);
+
   // Haptic debounce — minimum 800ms between haptic events
   const lastHapticTimeRef = useRef(0);
 
@@ -122,12 +142,18 @@ function useEnvironment(): UseEnvironmentReturn {
   }, []);
 
   const startMonitoring = useCallback(async () => {
+    const runId = ++runIdRef.current;
+
     try {
       setScreenState("initializing");
       setError(null);
 
       // Check availability
       const available = await environmentService.isAvailable();
+
+      // Cancelled (or restarted) while waiting: do not subscribe.
+      if (runId !== runIdRef.current) return;
+
       if (!available) {
         setScreenState("unavailable");
         setIsAvailable(false);
@@ -144,19 +170,24 @@ function useEnvironment(): UseEnvironmentReturn {
 
       currentStatusRef.current = "stable";
       isMonitoringRef.current = false;
+      lastUiUpdateRef.current = 0;
       sessionStartedRef.current = false;
 
       // Reset and start the service
       environmentService.reset();
 
       environmentService.start((newState) => {
-        // Update shared values ​​directly (without re-rendering)
         if (newState.data) {
-          magnitude.value = newState.data.magnitude;
+          // Throttled shared value writes (no React re-render involved)
+          const uiNow = Date.now();
+          if (uiNow - lastUiUpdateRef.current >= UI_UPDATE_INTERVAL_MS) {
+            lastUiUpdateRef.current = uiNow;
 
-          x.value = newState.data.x;
-          y.value = newState.data.y;
-          z.value = newState.data.z;
+            magnitude.value = withTiming(newState.data.magnitude, UI_TIMING);
+            x.value = withTiming(newState.data.x, UI_TIMING);
+            y.value = withTiming(newState.data.y, UI_TIMING);
+            z.value = withTiming(newState.data.z, UI_TIMING);
+          }
 
           // Lazy session creation — only on first actual data
           if (!sessionStartedRef.current) {
@@ -164,7 +195,13 @@ function useEnvironment(): UseEnvironmentReturn {
             historyService
               .createEnvironmentSession()
               .then((id) => {
-                sessionIdRef.current = id;
+                if (runId === runIdRef.current) {
+                  sessionIdRef.current = id;
+                } else {
+                  // Stopped before the session existed: close it now so it
+                  // is not left open or reused by the next run.
+                  historyService.finishEnvironmentSession(id).catch(() => {});
+                }
               })
               .catch(() => {});
           }
@@ -245,7 +282,10 @@ function useEnvironment(): UseEnvironmentReturn {
     }
   }, [magnitude, x, y, z]);
 
-  const stopMonitoring = useCallback(() => {
+  // Stops the sensor and closes the history session. Shared by the stop
+  // button and unmount so leaving the screen never leaves a session open.
+  const endRun = useCallback(() => {
+    runIdRef.current++;
     environmentService.stop();
 
     // Clear pending status timer
@@ -280,19 +320,15 @@ function useEnvironment(): UseEnvironmentReturn {
     }
 
     isMonitoringRef.current = false;
-    setScreenState("idle");
   }, []);
 
+  const stopMonitoring = useCallback(() => {
+    endRun();
+    setScreenState("idle");
+  }, [endRun]);
+
   // Cleanup upon disassembly
-  useEffect(() => {
-    return () => {
-      environmentService.stop();
-      if (statusTimerRef.current) {
-        clearTimeout(statusTimerRef.current);
-        statusTimerRef.current = null;
-      }
-    };
-  }, []);
+  useEffect(() => endRun, [endRun]);
 
   return {
     state: screenState,

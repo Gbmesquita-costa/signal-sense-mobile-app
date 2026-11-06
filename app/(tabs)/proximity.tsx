@@ -49,14 +49,16 @@ const ProximityScreen = () => {
   const proximity = useProximity();
   const rssiGraph = useRssiGraph();
 
-  const { isRttActive } = proximity;
+  const { isRttActive, proximityData, startMonitoring, stopMonitoring } =
+    proximity;
+  const { addSample } = rssiGraph;
 
-  // Feed RSSI data to graph — use lastUpdate as trigger so every update is captured
+  // Feed RSSI data to graph — every update produces a new proximityData object
   useEffect(() => {
-    if (proximity.proximityData) {
-      rssiGraph.addSample(proximity.proximityData.rssi);
+    if (proximityData) {
+      addSample(proximityData.rssi);
     }
-  }, [proximity.proximityData?.lastUpdate, rssiGraph.addSample]);
+  }, [proximityData, addSample]);
 
   const isLoading = proximity.state === "initializing";
 
@@ -80,13 +82,13 @@ const ProximityScreen = () => {
 
   const handleStartMonitoring = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    proximity.startMonitoring();
-  }, [proximity.startMonitoring]);
+    startMonitoring();
+  }, [startMonitoring]);
 
   const handleStopMonitoring = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    proximity.stopMonitoring();
-  }, [proximity.stopMonitoring]);
+    stopMonitoring();
+  }, [stopMonitoring]);
 
   const handleGoToScan = useCallback(() => {
     if (navigatingRef.current) return;

@@ -62,12 +62,12 @@ function RootLayoutContent() {
 
         tryDismissSplash();
       });
-  }, []);
+  }, [tryDismissSplash]);
 
   const handleSplashFinish = useCallback(() => {
     animationDoneRef.current = true;
     tryDismissSplash();
-  }, []);
+  }, [tryDismissSplash]);
 
   return (
     <>
@@ -122,6 +122,12 @@ function RootLayoutContent() {
         />
         <Stack.Screen
           name="camera-detector"
+          options={{
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="ar-finder"
           options={{
             animation: "slide_from_right",
           }}
