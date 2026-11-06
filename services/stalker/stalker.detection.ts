@@ -55,19 +55,6 @@ class StalkerDetectionService {
     // Skip trusted devices
     if (this.trustedDeviceIds.has(device.id)) return null;
 
-    // Skip devices we already alerted about — unless the user dismissed
-    // that alert and the cooldown has expired, in which case we free
-    // the device to be re-evaluated and possibly re-alerted.
-    if (this.alertedDeviceIds.has(device.id)) {
-      const dismissedAt = this.dismissedAt.get(device.id);
-
-      if (dismissedAt === undefined) return null;
-      if (Date.now() - dismissedAt < this.config.dismissCooldownMs) return null;
-
-      this.alertedDeviceIds.delete(device.id);
-      this.dismissedAt.delete(device.id);
-    }
-
     // Check if it's a known tracker type (for metadata enrichment)
     const tracker = trackerDetector.detect({
       name: device.name,
@@ -100,6 +87,11 @@ class StalkerDetectionService {
       };
 
       this.trackedDevices.set(device.id, tracked);
+    } else if (now - tracked.lastSeen > this.config.timeWindowMs) {
+      // The device was gone for longer than the whole window, so this is a
+      // new encounter. Keeping the old firstSeen would let a device seen once
+      // hours ago alert after a few sightings now.
+      tracked.firstSeen = now;
     }
 
     // Add sighting
@@ -121,26 +113,36 @@ class StalkerDetectionService {
     const suspicious = this.evaluateDevice(tracked);
     tracked.isSuspicious = suspicious;
 
-    if (suspicious) {
-      return this.createAlert(tracked);
+    if (!suspicious) return null;
+
+    // Already alerted: stay quiet unless the user dismissed that alert and
+    // the cooldown has expired. Sightings are still recorded above, so a
+    // device that kept following during the cooldown re-alerts right away.
+    if (this.alertedDeviceIds.has(device.id)) {
+      const dismissedAt = this.dismissedAt.get(device.id);
+
+      if (dismissedAt === undefined) return null;
+      if (now - dismissedAt < this.config.dismissCooldownMs) return null;
+
+      this.alertedDeviceIds.delete(device.id);
+      this.dismissedAt.delete(device.id);
     }
 
-    return null;
+    return this.createAlert(tracked);
   }
 
-  /** Prune sightings outside the time window (keeps firstSeen intact) */
+  /** Prune sightings outside the time window (firstSeen is kept) */
   private pruneSightings(tracked: TrackedDevice): void {
     const cutoff = Date.now() - this.config.timeWindowMs;
     tracked.sightings = tracked.sightings.filter((s) => s.timestamp >= cutoff);
-    // firstSeen is NOT updated here — it records the absolute first encounter
-    // so that evaluateDevice can correctly measure total tracking duration.
+    // firstSeen is NOT updated here — it records the start of the current
+    // encounter so that evaluateDevice can measure how long it has lasted.
   }
 
   /** Evaluate whether a tracked device is suspicious */
   private evaluateDevice(tracked: TrackedDevice): boolean {
-    // Use the span from absolute first sighting to now — not the pruned window.
-    // The pruned sightings are only used for counting; the original firstSeen
-    // (set once on first encounter) tracks how long the device has been around.
+    // Use the span from the start of the current encounter to now — not the
+    // pruned window. The pruned sightings are only used for counting.
     const now = Date.now();
     const totalDuration = now - tracked.firstSeen;
 

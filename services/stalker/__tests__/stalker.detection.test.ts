@@ -39,6 +39,16 @@ describe("stalkerDetectionService", () => {
     return result;
   };
 
+  /** Like `follow`, but reports whether any of the sightings alerted. */
+  const followAlerts = (count: number, stepMs: number) => {
+    let alerted = false;
+    for (let i = 0; i < count; i++) {
+      if (stalkerDetectionService.processDevice(device())) alerted = true;
+      jest.advanceTimersByTime(stepMs);
+    }
+    return alerted;
+  };
+
   it("does not alert before the time window has elapsed", () => {
     expect(follow(10, MINUTE)).toBeNull();
   });
@@ -63,11 +73,28 @@ describe("stalkerDetectionService", () => {
     expect(stalkerDetectionService.processDevice(device())).toBeNull();
 
     stalkerDetectionService.markDismissed(device().id);
+
+    // Still following during the whole cooldown: no alert until it ends.
+    expect(follow(30, MINUTE)).toBeNull();
+    expect(stalkerDetectionService.processDevice(device())).not.toBeNull();
+  });
+
+  it("needs a full window again after the device was gone for a while", () => {
+    follow(15, MINUTE);
+    expect(stalkerDetectionService.processDevice(device())).not.toBeNull();
+
+    stalkerDetectionService.markDismissed(device().id);
     jest.advanceTimersByTime(31 * MINUTE);
 
-    // Sightings from before the cooldown fell out of the window, so the
-    // device must be seen minSightings times again before re-alerting.
-    expect(follow(2, MINUTE)).toBeNull();
-    expect(stalkerDetectionService.processDevice(device())).not.toBeNull();
+    // Back after a long absence: a fresh encounter, not 46 minutes of following.
+    expect(followAlerts(5, MINUTE)).toBe(false);
+    expect(followAlerts(11, MINUTE)).toBe(true);
+  });
+
+  it("does not alert for a device seen once long ago and briefly again now", () => {
+    stalkerDetectionService.processDevice(device());
+    jest.advanceTimersByTime(3 * 60 * MINUTE);
+
+    expect(followAlerts(5, 10 * 1000)).toBe(false);
   });
 });
