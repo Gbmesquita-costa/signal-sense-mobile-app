@@ -14,6 +14,7 @@ module.exports = {
     "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@shopify/.*|@gorhom/.*|lucide-react-native|nativewind|react-native-css-interop)",
   ],
   collectCoverageFrom: [
+    "domain/**/*.{ts,tsx}",
     "services/**/*.{ts,tsx}",
     "hooks/**/*.{ts,tsx}",
     "stores/**/*.{ts,tsx}",
