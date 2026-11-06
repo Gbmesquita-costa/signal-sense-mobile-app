@@ -1,4 +1,4 @@
-import { wifiService } from "../wifi.service";
+import { parseSecurity, wifiService } from "../wifi.service";
 import type { WifiNetwork } from "../wifi.types";
 
 const network = (channel: number, ssid: string): WifiNetwork => ({
@@ -46,5 +46,19 @@ describe("wifiService", () => {
       { channel: 6, band: "2.4 GHz", networkCount: 5, congestion: "high" },
       { channel: 11, band: "2.4 GHz", networkCount: 3, congestion: "medium" },
     ]);
+  });
+
+  it("parses security from Android capability strings", () => {
+    expect(parseSecurity("[WPA2-PSK-CCMP][RSN-PSK-CCMP][ESS]")).toBe("WPA2");
+    expect(parseSecurity("[RSN-PSK-CCMP][ESS]")).toBe("WPA2");
+    expect(parseSecurity("[WPA2-EAP-CCMP][ESS]")).toBe("WPA2");
+    expect(parseSecurity("[RSN-SAE-CCMP][ESS]")).toBe("WPA3");
+    expect(parseSecurity("[WPA2-PSK+SAE-CCMP][ESS]")).toBe("WPA3");
+    expect(parseSecurity("[RSN-EAP_SUITE_B_192-GCMP-256][ESS]")).toBe("WPA3");
+    expect(parseSecurity("[RSN-OWE-CCMP][ESS]")).toBe("Open");
+    expect(parseSecurity("[WPA-PSK-TKIP][ESS]")).toBe("WPA");
+    expect(parseSecurity("[WEP][ESS]")).toBe("WEP");
+    expect(parseSecurity("[ESS]")).toBe("Open");
+    expect(parseSecurity("")).toBe("Unknown");
   });
 });
