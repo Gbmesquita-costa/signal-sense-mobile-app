@@ -106,6 +106,10 @@ function useEnvironment(): UseEnvironmentReturn {
   // Reference to control whether it is already monitoring (prevents setScreenState from looping)
   const isMonitoringRef = useRef(false);
 
+  // Incremented on every start and stop; async work from an older run
+  // (availability check, session creation) compares against it and bails.
+  const runIdRef = useRef(0);
+
   // UI throttle — last time the shared values were written
   const lastUiUpdateRef = useRef(0);
 
@@ -138,12 +142,18 @@ function useEnvironment(): UseEnvironmentReturn {
   }, []);
 
   const startMonitoring = useCallback(async () => {
+    const runId = ++runIdRef.current;
+
     try {
       setScreenState("initializing");
       setError(null);
 
       // Check availability
       const available = await environmentService.isAvailable();
+
+      // Cancelled (or restarted) while waiting: do not subscribe.
+      if (runId !== runIdRef.current) return;
+
       if (!available) {
         setScreenState("unavailable");
         setIsAvailable(false);
@@ -185,7 +195,13 @@ function useEnvironment(): UseEnvironmentReturn {
             historyService
               .createEnvironmentSession()
               .then((id) => {
-                sessionIdRef.current = id;
+                if (runId === runIdRef.current) {
+                  sessionIdRef.current = id;
+                } else {
+                  // Stopped before the session existed: close it now so it
+                  // is not left open or reused by the next run.
+                  historyService.finishEnvironmentSession(id).catch(() => {});
+                }
               })
               .catch(() => {});
           }
@@ -266,7 +282,10 @@ function useEnvironment(): UseEnvironmentReturn {
     }
   }, [magnitude, x, y, z]);
 
-  const stopMonitoring = useCallback(() => {
+  // Stops the sensor and closes the history session. Shared by the stop
+  // button and unmount so leaving the screen never leaves a session open.
+  const endRun = useCallback(() => {
+    runIdRef.current++;
     environmentService.stop();
 
     // Clear pending status timer
@@ -301,19 +320,15 @@ function useEnvironment(): UseEnvironmentReturn {
     }
 
     isMonitoringRef.current = false;
-    setScreenState("idle");
   }, []);
 
+  const stopMonitoring = useCallback(() => {
+    endRun();
+    setScreenState("idle");
+  }, [endRun]);
+
   // Cleanup upon disassembly
-  useEffect(() => {
-    return () => {
-      environmentService.stop();
-      if (statusTimerRef.current) {
-        clearTimeout(statusTimerRef.current);
-        statusTimerRef.current = null;
-      }
-    };
-  }, []);
+  useEffect(() => endRun, [endRun]);
 
   return {
     state: screenState,
