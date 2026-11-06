@@ -65,4 +65,52 @@ describe("trackerDetector", () => {
       trackerDetector.detect({ ...emptyDevice, name: "Mi Band 7" }),
     ).toMatchObject({ isTracker: false, type: null, brand: null });
   });
+
+  it("decodes manufacturer data of any padding length", () => {
+    // 6, 5 and 4 bytes encode with zero, one and two "=" padding characters.
+    for (const bytes of [
+      [0xd7, 0x00, 0x01, 0x02, 0x03, 0x04],
+      [0xd7, 0x00, 0x01, 0x02, 0x03],
+      [0xd7, 0x00, 0x01, 0x02],
+    ]) {
+      const manufacturerData = toBase64(bytes);
+
+      expect(
+        trackerDetector.detect({ ...emptyDevice, manufacturerData }),
+      ).toMatchObject({ isTracker: true, brand: "Tile" });
+    }
+  });
+
+  it("falls through to the name when manufacturer data is too short", () => {
+    expect(
+      trackerDetector.detect({
+        ...emptyDevice,
+        name: "AirTag",
+        manufacturerData: toBase64([0x4c, 0x00]),
+      }),
+    ).toMatchObject({ isTracker: true, type: "airtag", confidence: "high" });
+
+    expect(
+      trackerDetector.detect({
+        ...emptyDevice,
+        manufacturerData: toBase64([0x4c]),
+      }).isTracker,
+    ).toBe(false);
+  });
+
+  it("prefers the advertised name over localName", () => {
+    expect(
+      trackerDetector.detect({
+        ...emptyDevice,
+        name: "Find My Keys",
+        localName: "Tile Mate",
+      }),
+    ).toMatchObject({ type: "findmy", brand: "Apple", confidence: "medium" });
+  });
+
+  it("ignores an empty service UUID list", () => {
+    expect(
+      trackerDetector.detect({ ...emptyDevice, serviceUUIDs: [] }).isTracker,
+    ).toBe(false);
+  });
 });
