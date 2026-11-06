@@ -76,6 +76,9 @@ const CustomTabBar = ({
         return (
           <Pressable
             key={route.key}
+            testID={`tab-${route.name}`}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: isFocused }}
             onPress={() => {
               const event = navigation.emit({
                 type: "tabPress",
@@ -152,6 +155,7 @@ const TabsLayout = () => {
           <View className="flex-row items-center gap-1">
             <Pressable
               onPress={() => navigate("/camera-detector")}
+              testID="header-camera-detector"
               className="p-2 active:opacity-70"
               hitSlop={8}
               accessibilityLabel={t("cameraDetector.title")}
@@ -164,6 +168,7 @@ const TabsLayout = () => {
             </Pressable>
             <Pressable
               onPress={() => navigate("/history")}
+              testID="header-history"
               className="p-2 active:opacity-70"
               hitSlop={8}
             >
@@ -171,6 +176,7 @@ const TabsLayout = () => {
             </Pressable>
             <Pressable
               onPress={() => navigate("/settings")}
+              testID="header-settings"
               className="p-2 -mr-2 active:opacity-70"
               hitSlop={8}
             >
