@@ -1,0 +1,5 @@
+# Maestro workspace config: `maestro test .maestro` runs every flow below.
+flows:
+  - "flows/*"
+executionOrder:
+  continueOnFailure: false

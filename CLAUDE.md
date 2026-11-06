@@ -26,6 +26,7 @@ npm run typecheck      # tsc --noEmit
 npm run lint           # expo lint (eslint-config-expo, flat config)
 npm test               # Jest with the jest-expo preset
 npm run test:coverage  # coverage report in coverage/ (git-ignored)
+npm run e2e            # Maestro UI flows; needs an emulator/device (see .maestro/README.md)
 ```
 
 Run `npm run typecheck`, `npm run lint` and `npm test` before every commit.

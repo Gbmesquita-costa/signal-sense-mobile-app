@@ -1,0 +1,23 @@
+# The app opens on the Scan tab with the header actions visible.
+appId: com.signalsense.app
+name: Launch
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+    permissions:
+      all: allow
+- extendedWaitUntil:
+    visible:
+      id: "tab-scan"
+    timeout: 20000
+- assertVisible:
+    id: "tab-scan"
+    selected: true
+- assertVisible:
+    id: "header-settings"
+- assertVisible:
+    id: "header-history"
+- assertVisible:
+    id: "header-camera-detector"

@@ -1,0 +1,38 @@
+# Every tab can be reached by tapping it, and the tab bar follows.
+appId: com.signalsense.app
+name: Navigate tabs
+tags:
+  - smoke
+---
+- launchApp:
+    permissions:
+      all: allow
+- extendedWaitUntil:
+    visible:
+      id: "tab-scan"
+    timeout: 20000
+- tapOn:
+    id: "tab-proximity"
+- assertVisible:
+    id: "tab-proximity"
+    selected: true
+- tapOn:
+    id: "tab-wifi"
+- assertVisible:
+    id: "tab-wifi"
+    selected: true
+- tapOn:
+    id: "tab-environment"
+- assertVisible:
+    id: "tab-environment"
+    selected: true
+- tapOn:
+    id: "tab-education"
+- assertVisible:
+    id: "tab-education"
+    selected: true
+- tapOn:
+    id: "tab-scan"
+- assertVisible:
+    id: "tab-scan"
+    selected: true
