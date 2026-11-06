@@ -39,8 +39,23 @@ Builds and OTA updates go through EAS (`eas.json`):
 | `preview`     | internal APK           | `staging`      |
 | `production`  | app bundle (Play)      | `production`   |
 
-`.github/workflows/deploy.yml` runs EAS builds and needs the `EXPO_TOKEN`
-GitHub secret.
+GitHub Actions:
+
+- `ci.yml` – lint, typecheck and Jest on every push and pull request to
+  `main` and `staging`.
+- `deploy.yml` – after the CI checks pass, a push to `staging` publishes an
+  EAS Update to the `staging` channel and a push to `main` to `production`.
+  Native builds only run by hand (workflow_dispatch, choose a profile);
+  production builds are auto-submitted to the Play internal track. Never runs
+  on pull requests. Needs the `EXPO_TOKEN` secret and an EAS project id in
+  `app.json` (`eas init`); without them the jobs skip with a notice. OTA
+  updates also need `expo-updates` installed and `updates.url` set
+  (`eas update:configure`), which is not done yet.
+- `dependabot.yml` – weekly npm and Actions update PRs against `staging`
+  (active once the file is on `main`, GitHub's default branch).
+
+Maestro UI flows live in `.maestro/` and are not run in CI (they need a
+device); see `.maestro/README.md`.
 
 ## Architecture
 
