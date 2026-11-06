@@ -1,5 +1,6 @@
 import NetInfo, { type NetInfoState } from "@react-native-community/netinfo";
 import { Platform } from "react-native";
+import type { WifiEntry } from "react-native-wifi-reborn";
 
 import type {
   FrequencyBand,
@@ -102,24 +103,52 @@ class WifiService {
       const WifiManager = await import("react-native-wifi-reborn");
       const networks = await WifiManager.default.loadWifiList();
 
-      const currentState = await NetInfo.fetch("wifi");
-      const currentSSID =
-        currentState.type === "wifi" ? currentState.details?.ssid : null;
-
-      return networks.map((net) => ({
-        ssid: net.SSID,
-        bssid: net.BSSID,
-        rssi: net.level,
-        frequency: net.frequency,
-        band: this.getFrequencyBand(net.frequency),
-        channel: this.getChannel(net.frequency),
-        security: parseSecurity(net.capabilities),
-        isConnected: net.SSID === currentSSID && currentSSID !== null,
-        timestamp: net.timestamp,
-      }));
+      return await this.toNetworks(networks);
     } catch {
       return [];
     }
+  }
+
+  /**
+   * Asks Android for a fresh scan (WifiManager.startScan) and waits for its
+   * results. Returns null when the request is rejected, which on Android 9+
+   * happens after 4 requests in 2 minutes in the foreground: the library
+   * then resolves a message string instead of a list. Callers must budget
+   * their requests and fall back to scanNearbyNetworks() in between.
+   */
+  async requestFreshScan(): Promise<WifiNetwork[] | null> {
+    if (Platform.OS !== "android") {
+      return null;
+    }
+
+    try {
+      const WifiManager = await import("react-native-wifi-reborn");
+      const result: unknown =
+        await WifiManager.default.reScanAndLoadWifiList();
+
+      if (!Array.isArray(result)) return null;
+      return await this.toNetworks(result as WifiEntry[]);
+    } catch {
+      return null;
+    }
+  }
+
+  private async toNetworks(entries: WifiEntry[]): Promise<WifiNetwork[]> {
+    const currentState = await NetInfo.fetch("wifi");
+    const currentSSID =
+      currentState.type === "wifi" ? currentState.details?.ssid : null;
+
+    return entries.map((net) => ({
+      ssid: net.SSID,
+      bssid: net.BSSID,
+      rssi: net.level,
+      frequency: net.frequency,
+      band: this.getFrequencyBand(net.frequency),
+      channel: this.getChannel(net.frequency),
+      security: parseSecurity(net.capabilities),
+      isConnected: net.SSID === currentSSID && currentSSID !== null,
+      timestamp: net.timestamp,
+    }));
   }
 
   /** Analyze channel congestion from network list */
