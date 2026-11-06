@@ -102,7 +102,7 @@ jobs:
           --non-interactive
 
   build:
-    name: EAS Build (${{ github.event.inputs.profile }})
+    name: EAS Build
     needs: checks
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
