@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
-import { Lock, RefreshCw, Shield, Wifi } from "lucide-react-native";
+import { Lock, Radar, RefreshCw, Shield, Wifi } from "lucide-react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -29,6 +29,8 @@ interface WifiNetworkListProps {
   };
   t: (key: string) => string;
   onRefresh: () => void;
+  /** Opens the AR Signal Finder for this network. Hidden when omitted. */
+  onLocate?: (network: WifiNetwork) => void;
 }
 
 const WifiNetworkList = ({
@@ -38,6 +40,7 @@ const WifiNetworkList = ({
   theme,
   t,
   onRefresh,
+  onLocate,
 }: WifiNetworkListProps) => {
   // Refresh button rotation animation
   const rotation = useSharedValue(0);
@@ -233,6 +236,19 @@ const WifiNetworkList = ({
                     {net.rssi} dBm
                   </Text>
                 </View>
+
+                {onLocate && (
+                  <Pressable
+                    testID={`wifi-locate-${net.bssid}`}
+                    onPress={() => onLocate(net)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("arFinder.locate")}
+                    hitSlop={8}
+                    className="ml-3 p-1.5 active:opacity-70"
+                  >
+                    <Radar size={16} color={theme.primary} strokeWidth={2} />
+                  </Pressable>
+                )}
               </View>
             </View>
           );

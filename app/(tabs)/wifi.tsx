@@ -21,6 +21,7 @@ import {
   ChevronRight,
   Crosshair,
   Lightbulb,
+  Radar,
   ScanSearch,
   WifiOff,
 } from "lucide-react-native";
@@ -50,6 +51,7 @@ import { useWifi } from "@/hooks/useWifi";
 
 import { useI18n } from "@/lib/i18n";
 import { safePush } from "@/lib/navigation";
+import type { WifiNetwork } from "@/services/wifi/wifi.types";
 import { useTheme } from "@/theme";
 
 const WifiScreen = () => {
@@ -63,6 +65,16 @@ const WifiScreen = () => {
   const openCameraDetector = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     safePush(router, "/camera-detector");
+  };
+
+  const openArFinder = (network?: WifiNetwork) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    safePush(
+      router,
+      network
+        ? `/ar-finder?bssid=${encodeURIComponent(network.bssid)}&ssid=${encodeURIComponent(network.ssid)}`
+        : "/ar-finder",
+    );
   };
 
   const {
@@ -408,6 +420,50 @@ const WifiScreen = () => {
         </Animated.View>
       )}
 
+      {/* AR Signal Finder entry (Premium, Android only) */}
+      {isAndroid && (
+        <Animated.View
+          className="mb-4"
+          entering={FadeInDown.delay(190).duration(400)}
+        >
+          <Pressable
+            testID="wifi-ar-finder-entry"
+            onPress={() => openArFinder()}
+            className={`flex-row items-center gap-3 p-4 rounded-2xl ${
+              isDark ? "bg-surface-dark" : "bg-surface"
+            }`}
+            style={{ borderWidth: 1, borderColor: `${theme.primary}40` }}
+          >
+            <View
+              className="w-11 h-11 rounded-xl items-center justify-center"
+              style={{ backgroundColor: `${theme.primary}1F` }}
+            >
+              <Radar size={22} color={theme.primary} strokeWidth={2} />
+            </View>
+            <View className="flex-1">
+              <View className="flex-row items-center gap-2">
+                <Text
+                  className={`text-sm font-bold ${
+                    isDark ? "text-text-primary-dark" : "text-text-primary"
+                  }`}
+                >
+                  {t("arFinder.entryTitle")}
+                </Text>
+                <PremiumBadge size="sm" />
+              </View>
+              <Text
+                className={`text-xs mt-0.5 ${
+                  isDark ? "text-text-secondary-dark" : "text-text-secondary"
+                }`}
+              >
+                {t("arFinder.entrySubtitle")}
+              </Text>
+            </View>
+            <ChevronRight size={18} color={theme.textSecondary} />
+          </Pressable>
+        </Animated.View>
+      )}
+
       {/* Nearby Networks (Premium - Android only) */}
       {isAndroid && (
         <Animated.View
@@ -422,6 +478,7 @@ const WifiScreen = () => {
               theme={theme}
               t={t}
               onRefresh={refreshNetworks}
+              onLocate={openArFinder}
             />
           </PremiumGate>
         </Animated.View>
