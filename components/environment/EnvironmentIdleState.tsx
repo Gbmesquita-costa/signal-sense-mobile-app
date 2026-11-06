@@ -48,7 +48,7 @@ const EnvironmentIdleState = ({
         false,
       );
     }
-  }, [isLoading]);
+  }, [isLoading, rotation]);
 
   const iconAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],

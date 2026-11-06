@@ -62,12 +62,12 @@ function RootLayoutContent() {
 
         tryDismissSplash();
       });
-  }, []);
+  }, [tryDismissSplash]);
 
   const handleSplashFinish = useCallback(() => {
     animationDoneRef.current = true;
     tryDismissSplash();
-  }, []);
+  }, [tryDismissSplash]);
 
   return (
     <>

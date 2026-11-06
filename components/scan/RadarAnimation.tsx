@@ -162,6 +162,9 @@ const RadarAnimation = ({
 
       cancelAnimation(pulse);
     };
+    // Shared values are stable refs and the start/stop helpers are recreated
+    // every render; the animation must only restart when isScanning flips.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isScanning]);
 
   // Button style with touch scale
