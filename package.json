@@ -13,7 +13,8 @@
     "pre:build": "expo prebuild",
     "dev:client": "expo start --dev-client",
     "devices": "adb devices",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
