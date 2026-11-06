@@ -14,6 +14,20 @@ import {
 
 const PREMIUM_CACHE_KEY = "@signalsense:premium_status";
 
+const FREE_STATUS: PremiumStatus = {
+  isPremium: false,
+  expirationDate: null,
+  productId: null,
+};
+
+/** A null expiration date means a lifetime (non-expiring) entitlement. */
+function isExpired(expirationDate: string | null): boolean {
+  if (!expirationDate) return false;
+
+  const expiresAt = Date.parse(expirationDate);
+  return !Number.isNaN(expiresAt) && expiresAt <= Date.now();
+}
+
 class PremiumService {
   private initialized = false;
   private listeners: ((status: PremiumStatus) => void)[] = [];
@@ -139,12 +153,22 @@ class PremiumService {
   private async getCachedStatus(): Promise<PremiumStatus> {
     try {
       const cached = await AsyncStorage.getItem(PREMIUM_CACHE_KEY);
-      if (cached) return JSON.parse(cached);
+      if (cached) {
+        const status: PremiumStatus = JSON.parse(cached);
+
+        // The cache is only a fallback for when RevenueCat is unreachable;
+        // it must not keep a subscription alive past its expiration date.
+        if (status.isPremium && isExpired(status.expirationDate)) {
+          return { ...FREE_STATUS };
+        }
+
+        return status;
+      }
     } catch {
       // Silently fail cache read
     }
 
-    return { isPremium: false, expirationDate: null, productId: null };
+    return { ...FREE_STATUS };
   }
 }
 

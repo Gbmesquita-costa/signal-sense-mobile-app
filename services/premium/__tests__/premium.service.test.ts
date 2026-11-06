@@ -52,4 +52,38 @@ describe("premiumService", () => {
       isPremium: true,
     });
   });
+
+  it("ignores a cached subscription that has already expired", async () => {
+    await AsyncStorage.setItem(
+      "@signalsense:premium_status",
+      JSON.stringify({
+        isPremium: true,
+        expirationDate: "2020-01-01T00:00:00Z",
+        productId: "signal_sense_premium",
+      }),
+    );
+    mockedPurchases.getCustomerInfo.mockRejectedValueOnce(new Error("offline"));
+
+    await expect(premiumService.checkStatus()).resolves.toEqual({
+      isPremium: false,
+      expirationDate: null,
+      productId: null,
+    });
+  });
+
+  it("keeps a cached subscription that has not expired yet", async () => {
+    await AsyncStorage.setItem(
+      "@signalsense:premium_status",
+      JSON.stringify({
+        isPremium: true,
+        expirationDate: "2999-01-01T00:00:00Z",
+        productId: "signal_sense_premium",
+      }),
+    );
+    mockedPurchases.getCustomerInfo.mockRejectedValueOnce(new Error("offline"));
+
+    await expect(premiumService.checkStatus()).resolves.toMatchObject({
+      isPremium: true,
+    });
+  });
 });
