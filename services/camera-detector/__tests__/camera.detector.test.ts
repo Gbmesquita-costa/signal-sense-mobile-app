@@ -48,8 +48,12 @@ describe("cameraDetector", () => {
     expect(reasonsFor("IPCAM-4821")).toContain("ssidPattern");
     expect(reasonsFor("Living Room Cam")).toContain("ssidPattern");
     expect(reasonsFor("Office NVR")).toContain("ssidPattern");
+    expect(reasonsFor("DVR_0042")).toContain("ssidPattern");
+    expect(reasonsFor("CAM_1234")).toContain("ssidPattern");
+    expect(reasonsFor("IPC_3F2A")).toContain("ssidPattern");
     expect(reasonsFor("Camila's iPhone")).not.toContain("ssidPattern");
     expect(reasonsFor("Cambridge Guest")).not.toContain("ssidPattern");
+    expect(reasonsFor("Webcams_Shop")).not.toContain("ssidPattern");
   });
 
   it("treats hidden and open networks as medium suspicion together", () => {
