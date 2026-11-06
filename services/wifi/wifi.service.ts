@@ -115,6 +115,7 @@ class WifiService {
         channel: this.getChannel(net.frequency),
         security: parseSecurity(net.capabilities),
         isConnected: net.SSID === currentSSID && currentSSID !== null,
+        timestamp: net.timestamp,
       }));
     } catch {
       return [];
