@@ -126,6 +126,12 @@ function RootLayoutContent() {
             animation: "slide_from_right",
           }}
         />
+        <Stack.Screen
+          name="ar-finder"
+          options={{
+            animation: "slide_from_right",
+          }}
+        />
       </Stack>
     </>
   );

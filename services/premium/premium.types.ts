@@ -23,7 +23,8 @@ type PremiumFeature =
   | "wifi_networks"
   | "wifi_channel_analysis"
   | "wifi_signal_graph"
-  | "camera_detector";
+  | "camera_detector"
+  | "ar_signal_finder";
 
 const REVENUECAT_API_KEY_ANDROID =
   process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID ?? "";
